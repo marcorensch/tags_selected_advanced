@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset>
+    <field type="text" name="order_by_customfield" label="Order by" description="Name of Customfield to sort by if not set article id is used to sort by" hint="name-of-field">
+    <!-- Date -->
+        <field type="spacer" name="spacer_date" label="Date" />
+          <field 
+            name="fieldname_date"
+            type="text"
+            label="Field Name Date"
+            hint="name-of-your-custom-field"
+            description="" />
+    </fieldset>
+    <fieldset>
+    <!-- Game Results -->
+        <field type="spacer" name="spacer_game_results" label="&lt;hr/&gt;Game Results" />
+        <field 
+            name="fieldname_team_a_name"
+            type="text"
+            label="Field Name Team A"
+            hint="name-of-your-custom-field"
+            description="Name of the Custom Field where Team A's Name is saved into" />
+
+        <field 
+            name="fieldname_team_a_pts"
+            type="text"
+            label="Field Name Team A Points"
+            hint="name-of-your-custom-field"
+            description="Name of the Custom Field where Team A's Points are saved into" />
+        
+        <field 
+            name="fieldname_team_b_name"
+            type="text"
+            label="Field Name Team B"
+            hint="name-of-your-custom-field"
+            description="Name of the Custom Field where Team B's Name is saved into" />
+
+        <field 
+            name="fieldname_team_b_pts"
+            type="text"
+            label="Field Name Team B Points"
+            hint="name-of-your-custom-field"
+            description="Name of the Custom Field where Team B's Points are saved into" />
+
+        <field
+            name="fieldlayout_game_result"
+            type="textarea" rows="6"
+            label="Field Display Template"
+            description="Custom HTML Layout (Placeholders: %a_name% , %a_pts%, %b_name%, %b_pts%)" />
+
+    </fieldset>
+   
+    <fieldset>
+    <!-- shorttext -->
+        <field type="spacer" name="spacer_shorttext" label="&lt;hr/&gt;Shorttext" />
+        <field 
+            name="fieldname_shorttext"
+            type="text"
+            label="Field Name Shorttext"
+            hint="name-of-your-custom-field"
+            description="" />
+        <field
+            name="fieldlayout_shorttext"
+            type="textarea" rows="6"
+            label="Shorttext Display Template"
+            description="Custom HTML Layout (Placeholder: %value%)" />
+    </fieldset>
+
+    <fieldset>
+    <!-- Player Info -->
+        <field type="spacer" name="spacer_playerinfo" label="&lt;hr/&gt;Player Informations" />
+        <field
+            name="fieldlayout_playercfields"
+            type="textarea" rows="6"
+            label="Player Info Template Ordering"
+            description="Place here all fields that should be rendered" />
+    </fieldset>
+     
+    
+</form>
