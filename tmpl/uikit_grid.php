@@ -34,18 +34,6 @@ $b = new ErrorMsg('title','Eine andere Message');
 $errors[] = $b->pushObject();
 */
 
-
-
-function firstWord($string){
-	$arr = explode(' ',trim($string));
-	return $arr[0];
-}; 
-
-function secondWord($string){
-	$arr = explode(' ',trim($string));
-	return $arr[1];
-};
-
 function applyBasicRule($input, $setup){
 	switch($setup->mode){
 		case 'before':
@@ -95,35 +83,6 @@ function multiexplode ($delimiters,$string) {
 	return  $launch;
 };
 
-function getImageUrl($item, $src_setup, $fieldname = null){
-	$img_url = '';
-	$img_err = '';
-	switch($src_setup){
-		case 'customfield':
-			if(!empty($fieldname)){
-				if (array_key_exists($fieldname, $item->fields)) {
-					$img_url = $item->fields[$fieldname]->rawvalue;
-				}else{
-					$img_err .= 'Defined Image Field (<i>'.$fieldname.'</i>) not found<br/>';
-					$error = new ErrorMsg('img', $img_err);
-					$errors[] = $error->pushObject();
-				}
-			}else{
-				$img_err .= 'Define Image Field for elements in Module Backend<br/>';
-			}
-		break;
-		case 'image_intro':
-		case 'image_fulltext':
-			$core_images = json_decode($item->core_images);
-			$img_url = $core_images->$src_setup;
-		break;
-		case 'none':
-		default:
-		// nope
-	};
-	return [$img_url, $img_err];
-};
-
 function imagebysetup($item, $context, $params, &$errors){
 	// returns the correct image URL & Error based on article / customfield & backend setup
 	// get debug state
@@ -141,13 +100,13 @@ function imagebysetup($item, $context, $params, &$errors){
 		case 'modal':
 			$src = $params->get('image_in_modal');
 			$image_in_modal = ($params->get('image_in_modal') == 'same') ? $params->get('image_source') : $params->get('image_in_modal'); // if its same use image_source as source
-			$url = getImageUrl($item, $image_in_modal, $params->get('customfield_for_modal_image', null) );
+			$url = ModTagsselectedHelper::getImageUrl($item, $image_in_modal, $params->get('customfield_for_modal_image', null) );
 			$img_src_setup = $params->get('customfield_for_modal_image');
 			break;
 		case 'card':
 		default:
 			$src = $params->get('image_source');
-			$url = getImageUrl($item, $params->get('image_source','image_intro'), $params->get('customfield_for_image', null) );
+			$url = ModTagsselectedHelper::getImageUrl($item, $params->get('image_source','image_intro'), $params->get('customfield_for_image', null) );
 			$img_src_setup = $params->get('customfield_for_image');
 	};
 	$use_img = ($src == 'none') ? false : true;

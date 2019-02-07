@@ -201,10 +201,11 @@
 					<option value="push">Push</option>
 				</field>
 
-				<field name="slideshow_autoplay" type="radio" default="true" label="Enable Autoplay" description="Should the Slideshow autoplay?" class="btn-group">
+				<field name="slideshow_autoplay" type="radio" default="1" label="Enable Autoplay" description="Should the Slideshow autoplay?" class="btn-group">
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
+
 				<field showon="slideshow_autoplay:1" name="slideshow_interval" label="Slideshow Interval" type="text" default="6000" hint="Value in ms eg. 5000" filter="integer" class="inputbox span1 small"
 				/>
 				<field name="slideshow_pause_on_hover" type="radio" default="true" label="Pause on Hover" description="Should the Slideshow pause on hover?" class="btn-group">
@@ -216,17 +217,12 @@
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
-				<field
-					name="slideshowminheight" label="Min height" description="Min height of the slideshow" type="text" default="300" hint="300" filter="integer" class="inputbox span1 small"
-				 />
-				<field
-					name="overlay_style" label="Overlay Style" description="Overlay style Class" type="list" default="primary">
+				<field name="slideshowminheight" label="Min height" description="Min height of the slideshow" type="text" default="300" hint="300" filter="integer" class="inputbox span1 small" />
+				<field name="slideshow_overlay_style" label="Overlay Style" description="Overlay style Class" type="list" default="primary">
 					<option value="primary">Primary</option>
-					<option value="secondary">Secondary (actually not supported)</option>
 					<option value="default">Default</option>
 				</field>
-				<field
-					name="overlay_width" label="Overlay width" description="The width of the overlay" type="list" default="medium">
+				<field name="overlay_width" label="Overlay width" description="The width of the overlay" type="list" default="medium">
 					<option value="small">small</option>
 					<option value="medium">medium</option>
 					<option value="large">large</option>
@@ -236,9 +232,68 @@
 					<option value="1-1">full</option>
 					<option value="auto">auto</option>
 				</field>
-				<field
-					name="customcss" label="Custom CSS" description="Inline custom CSS Styles for content area" type="textarea" default="" hint="margin-bottom:50px;" class="inputbox span3 small"
-				 />
+
+				<field name="overlay_margin" label="Overlay margin" description="The margin of the overlay" type="list" default="medium">
+					<option value="small">small</option>
+					<option value="medium">medium</option>
+					<option value="large">large</option>
+					<option value="xlarge">xlarge</option>
+					<option value="none">none</option>
+				</field>
+
+				<field name="slideshow_overlay_position" label="Overlay Position" description="The position of the overlay" type="list" default="bottom">
+					<option value="top">top</option>
+					<option value="top-left">top-left</option>
+					<!--<option value="top-center">top-center</option>-->
+					<option value="top-right">top-right</option>
+					<option value="left">left</option>
+					<option value="center-left">center-left</option>
+					<option value="center">center</option>
+					<option value="center-right">center-right</option>
+					<option value="right">right</option>
+					<option value="bottom">bottom</option>
+					<option value="bottom-left">bottom-left</option>
+					<option value="bottom-right">bottom-right</option>
+					<!--<option value="bottom-center">bottom-center</option>-->
+					
+				</field>
+
+				<field name="slideshow_overlay_transition" label="Overlay Animation" description="Animation type of the overlay" type="list" default="uk-transition-fade" class="">
+					<option value="no-transition">none</option>
+					<option value="uk-transition-fade">fade</option>
+					<option value="uk-transition-scale-up">scale up</option>
+					<option value="uk-transition-scale-down">scale down</option>
+					<option value="uk-transition-slide-top">slide top</option>
+					<option value="uk-transition-slide-top-small">slide top small</option>
+					<option value="uk-transition-slide-top-medium">slide top medium</option>
+					<option value="uk-transition-slide-bottom">slide bottom</option>
+					<option value="uk-transition-slide-bottom-small">slide bottom small</option>
+					<option value="uk-transition-slide-bottom-medium">slide bottom medium</option>
+					<option value="uk-transition-slide-left">slide left</option>
+					<option value="uk-transition-slide-left-small">slide left small</option>
+					<option value="uk-transition-slide-left-medium">slide left medium</option>
+					<option value="uk-transition-slide-right">slide right</option>
+					<option value="uk-transition-slide-right-small">slide right small</option>
+					<option value="uk-transition-slide-right-medium">slide right medium</option>
+				</field>
+
+				
+				<field name="customcss" label="Custom CSS" description="Inline custom CSS Styles for content area" type="textarea" default="" hint="margin-bottom:50px;" class="inputbox span3 small" />
+				<field type="spacer" name="slideshow_content_spacer_divider" hr="true" />
+				<field type="spacer" name="slideshow_content_spacer_name" label="Content Setup" />
+				<field name="slideshow_content_align" label="Alignement" description="Content Alignement on Slideshow" type="list" default="center">
+					<option value="left">left</option>
+					<option value="center">center</option>
+					<option value="right">right</option>
+				</field>
+				<field type="list" name="slideshow_meta_section" label="Meta Display" description="Define which Information should be displayed as meta" default="customfield">
+					<option value="none">Not used</option>
+				 	<option value="customfield">Customfield (define below)</option>
+					<option value="article_title">Article Title</option>
+					<option value="author">Author</option>
+					<option value="created">Date created</option>
+				</field>
+				<field showon="slideshow_meta_section:customfield" type="text" name="slideshow_meta_cf_name" label="Fieldname for Meta" description="Define Custom Field Name for Meta"  hint="field-name-a field-name-b" class="inputbox" />
 			</fieldset>
 			<fieldset name="grid">
 				<!-- UIkit GRID -->

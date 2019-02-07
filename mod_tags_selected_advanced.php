@@ -53,13 +53,22 @@ $buttonmargin = $params->get('buttonmargin', 'uk-padding-remove');
 $buttonstyle = $params->get('buttonstyle', 'default');
 
 //Overlay & Content
-$content_text_truncate = intval($params->get('content_text_truncate', '0'));
-$content_sentence_truncate = intval($params->get('content_sentence_truncate', '5'));
-$alignement = $params->get('content_alignement', 'center');
-$overlay_width = $params->get('overlay_width', 'medium');
-$overlay_style = $params->get('overlay_style', 'default');
-$overlay_transition = $params->get('overlay_transition','uk-transition-fade');
-$customcss = $params->get('customcss', '');
+$slideshow_autoplay = intval($params->get('slideshow_autoplay','1'));
+$slideshow_overlay_position = $params->get('slideshow_overlay_position','bottom');
+$slideshow_overlay_transition = $params->get('slideshow_overlay_transition','uk-transition-fade');
+$slideshow_overlay_width = $params->get('overlay_width','auto');
+$slideshow_overlay_setup = $params->get('overlay_margin','none');
+switch($slideshow_overlay_setup){
+	case 'none':
+		$slideshow_overlay_margin = '';
+	break;
+	case 'medium':
+	$slideshow_overlay_margin = ' uk-margin-left uk-margin-right uk-margin-bottom uk-margin-top';
+	break;
+	default:
+	$slideshow_overlay_margin = ' uk-margin-'.$slideshow_overlay_setup.'-left uk-margin-'.$slideshow_overlay_setup . '-right uk-margin-'.$slideshow_overlay_setup . '-bottom uk-margin-'.$slideshow_overlay_setup . '-top';
+}
+$slideshow_c_alignement = $params->get('slideshow_content_align','center');
 $moduleclass_sfx 	= htmlspecialchars($params->get('moduleclass_sfx'));
 
 // Customfields

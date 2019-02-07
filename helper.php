@@ -16,8 +16,65 @@ defined('_JEXEC') or die;
  * @subpackage  mod_tags_popular
  * @since       3.1
  */
-abstract class ModTagsselectedHelper
+class ModTagsselectedHelper
 {
+	public static function firstWord($string){
+		$arr = explode(' ',trim($string));
+    	return $arr[0];
+	}
+	public static function secondWord($string){
+		$arr = explode(' ',trim($string));
+    	return $arr[1];
+	}
+
+	public static function getImageUrl($item, $src_setup, $fieldname = null){
+		$img_url = '';
+		$img_err = '';
+		switch($src_setup){
+			case 'customfield':
+				if(!empty($fieldname)){
+					if (array_key_exists($fieldname, $item->fields)) {
+						$img_url = $item->fields[$fieldname]->rawvalue;
+					}else{
+						$img_err .= 'Defined Image Field (<i>'.$fieldname.'</i>) not found<br/>';
+						$error = new ErrorMsg('img', $img_err);
+						$errors[] = $error->pushObject();
+					}
+				}else{
+					$img_err .= 'Define Image Field for elements in Module Backend<br/>';
+				}
+			break;
+			case 'image_intro':
+			case 'image_fulltext':
+				$core_images = json_decode($item->core_images);
+				$img_url = $core_images->$src_setup;
+			break;
+			case 'none':
+			default:
+			// nope
+		};
+		return [$img_url, $img_err];
+	}
+
+	public static function getMeta($item, $params){
+		$html = '';
+		switch($params->get('slideshow_meta_section')){
+			case 'customfield':
+			break;
+			case 'article_title':
+			break;
+			case 'author':
+			break;
+			case 'created':
+				$date = ModTagsselectedHelper::firstWord($item->core_created_time);
+				$html .= '<span class="uk-text-small">'.date('d. M Y', strtotime($date)).'</span>';
+			break;
+			default:
+				$html .= '<span>something is wrong</span>';
+		};
+		return $html;
+	}
+
 	public static function getContentList($params)
 	{
 		JLoader::register('FieldsHelper', JPATH_ADMINISTRATOR . '/components/com_fields/helpers/fields.php'); //load fields helper
@@ -41,8 +98,8 @@ abstract class ModTagsselectedHelper
 		$customFieldsSetup = $params->get('customfields');
 
 		// Custom Field Values
-
-		function getFieldValues($array, $v){
+/*
+		private function getFieldValues($array, $v){
 			foreach($array as $struct) {
 				if ($v == $struct->name) {
 					$item = $struct;
@@ -53,7 +110,7 @@ abstract class ModTagsselectedHelper
 		}
 
 		
-		
+	*/	
 
 		// Strip off any slug data.
 		foreach ($id as $id)
