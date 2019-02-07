@@ -35,6 +35,7 @@ abstract class ModTagsselectedHelper
 		$prefix     	= $option . '.' . $view;
 		$id         	= (array) $app->input->getObject('id');
 		$selectedTags 	= $params->get('tags');
+		$nxdebug 		= $params->get('nxdebug');
 
 		// Custom Fields
 		$customFieldsSetup = $params->get('customfields');
@@ -111,19 +112,21 @@ abstract class ModTagsselectedHelper
 		}
 
 		// Sort Array
-		// Sort the multidimensional array
-		$orderByField = $params->get('order_by_customfield', 0);
-
-		
+		// Sort the multidimensional array if a field is setted up
+		$orderByField = $params->get('order_by_customfield');
 		usort($articles_by_tags, function($a, $b) use ($orderByField){
 			if(empty($orderByField)){
 				return $a->content_item_id > $b->content_item_id;
 			}else{
-				return $a->fields[$orderByField]->rawvalue > $b->fields[$orderByField]->rawvalue;
+				if (array_key_exists($orderByField, $a->fields)) {
+					return $a->fields[$orderByField]->rawvalue > $b->fields[$orderByField]->rawvalue;
+				}else
+				{
+					echo '<script type="text/javascript">console.log("Field '.$orderByField.' not found");</script>';
+					return $a->content_item_id > $b->content_item_id;
+				}
 			}
 		});
-
 		return $articles_by_tags;
-		
 	}
 }

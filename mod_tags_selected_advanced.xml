@@ -45,7 +45,7 @@
 					<option value="1">At least one has to match</option>
 					<option value="0">All Tags has to match</option>
 				</field>
-				
+				<field type="text" name="order_by_customfield" label="Order by" description="Name of customfield to sort by if not set article id is used to sort by" hint="name-of-field" />
 				<field name="layoutChoice" type="list" default="default" label="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_LABEL" description="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_DESCRIPTION" class="span3 small" >
 					<option value="default">Simple Listing</option>
 					<option value="uikit_slideshow">Slideshow (UIkit 3)</option>
@@ -111,12 +111,24 @@
 
 				<field type="spacer" name="content_text" label="Text Options" />
 				<field name="element_text_src" label="Text Source" description="" type="list" default="article_text"  class="span3">
+					<option value="none">Do not display text</option>
 					<option value="article_text">Article Text</option>
-					<option value="customfield">Customfield (set below)</option>
+					<option value="customfield">Customfield (set below)</option>	
 				</field>
 				<field showon="element_text_src:customfield" type="text" name="customfield_for_text" label="Customfield for Text" description="customfield which contains the Text / Introtext" hint="name-of-field" class="span3"/>
-				<field name="content_text_truncate" type="text" label="Max Characters" description="amount of max characters before truncate (0 = no truncation at all)" default="400" class="span1" filter="integer" />
-				<field name="content_sentence_truncate" type="text" label="Max Sentences" description="max amount of sentences before truncate" default="3" class="span3" filter="integer" />
+				<field showon="element_text_src:customfield,article_text" name="content_text_truncate" type="text" label="Max Characters" description="amount of max characters before truncate (0 = no truncation at all)" default="400" class="span1" filter="integer" />
+
+				<field type="spacer" name="content_cf" label="Front Customfields Options" />
+				<field
+					name="fields_to_render_front"
+					type="textarea" rows="6"
+					label="Fields to render in Front"
+					description="Which Fields should be rendered in Front? (one field-name per row or seperated by spaces)"
+					hint="" />
+				<field name="fields_front_display_label" type="radio" default="0" label="Display Label" description="Should the Field be rendered including label?" class="btn-group span3">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
+				</field>
 
 <!-- Link Settings --> 
 				<field type="spacer" hr="true"/>
@@ -161,6 +173,10 @@
 					<option value="left">left</option>
 					<option value="center">center</option>
 					<option value="right">right</option>
+				</field>
+				<field name="button_always_bottom" type="radio" label="Positioning on the bottom" description="" default="1" class="btn-group">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
 				</field>
 				<field name="linktarget" label="Link Target" default="_parent" description="" type="list" class="span3">
 					<option value="_self">self</option>
@@ -278,7 +294,7 @@
 					<option value="0">JNo</option>
 				</field>
 
-				<field showon="image_pos:top,bottom[OR]element_layout:image_card[AND]image_cover:1" name="image_container_height" label="Image Cover height" description="Here you can define a fixed height for the image container" type="list" default="none">
+				<field showon="image_pos:top,bottom[OR]element_layout:default_card[AND]image_cover:1" name="image_container_height" label="Image Cover height" description="Here you can define a fixed height for the image container" type="list" default="none">
 					<option value="none">not set</option>
 					<option value="small">small</option>
 					<option value="medium">medium</option>
@@ -286,16 +302,30 @@
 				</field>
 				
 			</fieldset>
+<!-- Modal Settings -->
+			<fieldset name="modal_setup">
+			<field
+            name="title_to_render_modal"
+            type="textarea" rows="6"
+            label="Fields to render as Modal Title"
+            description="Which Fields should be rendered as Modal Title? (one field-name per row or seperated by spaces)"
+			hint="field-name-a field-name-b" />
 
-			<fieldset name="fields">
-			<field type="text" name="order_by_customfield" label="Order by" description="Name of customfield to sort by if not set article id is used to sort by" hint="name-of-field" />
 			<field
             name="fields_to_render_modal"
             type="textarea" rows="6"
             label="Fields to render in Modal"
             description="Which Fields should be rendered in Modal? (one field-name per row or seperated by spaces)"
-			hint="" />
+			hint="field-name-a field-name-b" />
 
+			<field name="image_in_modal" label="Display Image in Modal" description="Should the Modal contain an image" type="list" default="none">
+				<option value="none">no Image</option>
+				<option value="same">Default Image</option>
+				<option value="customfield">Customfield (define below)</option>
+				<option value="image_fulltext">Full Image</option>
+				<option value="image_intro">Intro Image</option>
+			</field>
+			<field showon="image_in_modal:customfield" type="text" name="customfield_for_modal_image" label="Customfield for Image" description="customfield which contains the Image" hint="name-of-field" class="span3"/>
 			
 
 			</fieldset>
