@@ -33,6 +33,9 @@ $errors[] = $a->pushObject();
 $b = new ErrorMsg('title','Eine andere Message');
 $errors[] = $b->pushObject();
 */
+
+
+
 function firstWord($string){
 	$arr = explode(' ',trim($string));
 	return $arr[0];
@@ -41,6 +44,47 @@ function firstWord($string){
 function secondWord($string){
 	$arr = explode(' ',trim($string));
 	return $arr[1];
+};
+
+function applyBasicRule($input, $setup){
+	switch($setup->mode){
+		case 'before':
+			$string = $setup->value . trim($input->fieldvalue);
+			break;
+		case 'after':
+			$string = trim($input->fieldvalue) . $setup->value;
+			break;
+		default:
+			$string = trim($input->fieldvalue);
+	};
+	return $string;
+};
+
+function customRules($input, $rules){
+	// This function manipulates the string if setted up
+	// It appends strings in before or after the string (example: 21 --> #21)
+	// Input as Object {'fieldname': 'name-of-field', 'fieldvalue': 'Ein String'}
+	// Setup as object {'fieldname': 'name-of-field', 'mode': ['before', 'after'], 'value': '#'}
+	// returns string: #Ein String
+	
+	foreach($rules as $rule){
+		$rule_fieldname  = $rule->customfield_for_rule;
+
+		if($rule_fieldname === $input->fieldname){
+			// Break if we are not in the correct context (modal / card / always)
+			if($rule->rule_target !== 'always' && $rule->rule_target !== $input->context) break;
+			$setup = (object) ['mode' => $rule->rule_type, 'value' => $rule->rule_string_to_add];
+			// As function because we could make it bigger if necessary
+			$html = applyBasicRule($input, $setup);
+		
+			break;
+		};
+	};
+	
+	if(empty($html)) $html = trim($input->fieldvalue);
+
+	return $html;
+
 };
 
 function multiexplode ($delimiters,$string) {
@@ -139,48 +183,6 @@ function imagebysetup($item, $context, $params, &$errors){
 	return $img;
 };
 
-function imageCardRender($img, $params, &$errors){
-	$html = '';
-	$nxdebug = $params->get('nxdebug',0);
-
-	// Display message if something isn't right about the image configuration
-	if(!empty($img->error) && $nxdebug){
-		$html .=		'<div class="uk-position-top uk-padding-small">'.$img->error.'</div>';
-	};
-	$cover = intval($params->get('image_cover',0));
-	$height = '';
-	if($params->get('image_container_height') !== 'none'){
-		$height = 'uk-height-'.$params->get('image_container_height');
-	}
-
-	if(in_array($img->pos, array('top','bottom')) || $params->get('element_layout') === 'image_card' ){
-		
-		
-		//Switch for Cover image Container on Top or bottom
-		if($cover){
-			$html .= '<div class="uk-card-media-'.$img->pos.' uk-cover-container '.$height.'">';
-				$html .= '<img src="'.$img->url.'" width="100%" uk-cover alt="">';
-				$html .= '<canvas width="" height=""></canvas>';
-			$html .= '</div>';
-
-		}else{
-			$html .= '<div class="uk-card-media-'.$img->pos.'">';
-				$html .= '<img src="'.$img->url.'" width="100%" alt="">';
-			$html .= '</div>';
-		};
-		
-	}
-	elseif(in_array($img->pos, array('left','right'))){
-		$classes = '';
-		if($img->pos == 'right') $classes .= 'uk-flex-last@s ';
-
-		$html .= '<div class="'.$classes.'uk-card-media-'.$img->pos.' uk-cover-container">';
-			$html .= '<img src="'.$img->url.'" width="100%" alt="" uk-cover>';
-			$html .= '<canvas width="600" height="400"></canvas>';
-		$html .= '</div>';
-	};
-	return $html;
-};
 
 class CardField{
 
@@ -268,14 +270,19 @@ function cardFieldsRender($item, $params, &$errors){
 };
 
 function textCardRender($item, $params, &$errors){
+	// Renders the Title and the Textfield on the Cards (Frontview)
 	// Prepare Content based on setup
 	$nxdebug = $params->get('nxdebug', 0);
 	$alignement = $params->get('content_alignement', 'left');
 	$title_tag = $params->get('title_tag','h3');
 	$title_cls= $params->get('title_cls','');
+	$text_tag = $params->get('text_tag','span');
+	$text_cls= $params->get('text_cls','');
+	// Customfield rules
+	$rules = $params->get('customfield_rules',[]);
 	$html = '';
 	$error = '';
-	// Prepate title based on setup
+	// Prepare title based on setup
 	switch($params->get('element_title_src')){
 		case 'customfield':
 			if(!empty($params->get('customfield_for_title')))
@@ -288,7 +295,9 @@ function textCardRender($item, $params, &$errors){
 					if(strlen($title) > 1) $title .= ' ';
 					if(array_key_exists($fieldname, $item->fields))
 					{
-						$title .= $item->fields[$fieldname]->value;
+						// Object for customfield rules
+						$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'card']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+						$title .= customRules($cf_object, $rules); 																			//$item->fields[$fieldname]->value;
 					}else{	
 						$error .= 'Given Customfield ' . $fieldname . ' for Title not found!';
 						if(strlen($title) == 0) {
@@ -308,21 +317,31 @@ function textCardRender($item, $params, &$errors){
 			$title = $item->core_title;
 	};
 	// prepare text based on setup
+	$text = '';
 	switch($params->get('element_text_src')){
 		case 'none':
-			$text = '';
 			break;
 		case 'customfield':
 			if(!empty($params->get('customfield_for_text')))
 			{
-				$fieldname = $params->get('customfield_for_text');
-				if(array_key_exists($fieldname, $item->fields))
-				{
-					$text = $item->fields[$fieldname]->value;
-				}else{	
-					$error .= 'Given Customfield ' . $fieldname . ' for Text not found!';
-					$error .= ' - Article Text used instead!';
-					$text = $item->core_body;
+				$cf_name_field = $params->get('customfield_for_text');
+				$cf_name = explode(" ", $cf_name_field);
+
+				foreach($cf_name as $fieldname){
+					if(!empty($error)) continue;
+					if(strlen($text) > 1) $text .= ' ';
+					if(array_key_exists($fieldname, $item->fields))
+					{
+						// Object for customfield rules
+						$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'card']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+						$text .= customRules($cf_object, $rules);  //$item->fields[$fieldname]->value;
+					}else{	
+						$error .= 'Given Customfield ' . $fieldname . ' for Text not found!';
+						if(strlen($text) == 0) {
+							$error .= ' - Article Text used instead!';
+							$text = $item->core_body;
+						};
+					};
 				};
 			}else
 			{
@@ -341,17 +360,122 @@ function textCardRender($item, $params, &$errors){
 	// build the HTML
 	switch($params->get('element_layout')){
 		case 'image_card':
+			$html .=	'<div class="uk-position-relative uk-text-'.$alignement.'">';
+			if($nxdebug && !empty($error)) $html .= '<div class=""><div class="uk-alert uk-alert-danger">'.$error.'</div></div>';
+			$html .= 		'<'.$title_tag.' class="'.$title_cls.'">'.$title.'</'.$title_tag.'>';
+			$html .=		'<div class="uk-position-relative">';
+			$html .=			'<'.$text_tag.' class="'.$text_cls.'">';
+			$html .= 				$text;
+			$html .=			'</'.$text_tag.'>';
+			$html .=		'</div>';
+			$html .=	'</div>';
 			break;
 		case 'default_card':
 		default:
 			$html .=	'<div class="uk-card-body uk-text-'.$alignement.' uk-position-relative">';
 			if($nxdebug && !empty($error)) $html .= '<div class=""><div class="uk-alert uk-alert-danger">'.$error.'</div></div>';
 			$html .= 	'<'.$title_tag.' class="'.$title_cls.'">'.$title.'</'.$title_tag.'>';
-			$html .=		'<div class="">';
+			$html .=		'<'.$text_tag.' class="'.$text_cls.'">';
 
-			$html .=			$text.'</div>'.
-						'</div>';
+			$html .=			$text.'</'.$text_tag.'>';
+			$html .=	'</div>';
 	};
+
+	return $html;
+};
+
+function imageCardRender($item, $img, $params, &$errors){
+	$html = '';
+	$nxdebug = $params->get('nxdebug',0);
+
+	// Display message if something isn't right about the image configuration
+	if(!empty($img->error) && $nxdebug){
+		$html .=		'<div class="uk-position-top uk-padding-small">'.$img->error.'</div>';
+	};
+	$cover = intval($params->get('image_cover',0));
+	$height = '';
+	if($params->get('image_container_height') !== 'none'){
+		$height = 'uk-height-'.$params->get('image_container_height');
+	}
+
+	switch($params->get('element_layout')){
+		case 'image_card':
+			$overlay_type = $params->get('overlay_type','bottom');
+			$overlay_style = $params->get('overlay_style','default');
+			$overlay_content_style = $params->get('overlay_content_style','light');
+			$overlay_content_position = $params->get('overlay_content_position','center');		// used in Overlay Cover Mode
+
+			if($params->get('overlay_transition','none') !== 'none'){
+				$overlay_transition = $params->get('overlay_transition');
+				$transition_toggle = 'uk-transition-toggle " tabindex="0">';
+			}else{
+				$overlay_transition = '';
+				$transition_toggle = '">';
+			}
+			
+			
+
+			if($overlay_type !== 'none') $html .= '<div class="uk-inline-clip uk-width-1-1 '.$transition_toggle;
+
+			$html .= '<img src="'.$img->url.'" width="100%" alt="">';
+			if($overlay_type !== 'none'){
+				if($overlay_type == 'cover') {
+					$html .= 	'<div class="'.$overlay_transition.' uk-overlay-'.$overlay_style.' uk-padding-small uk-position-cover"></div>';
+					$html .= 	'<div class="uk-overlay uk-position-'.$overlay_content_position.' uk-'.$overlay_content_style.'">';
+					$html .= 	textCardRender($item, $params, $errors);
+					if($params->get('linktype') == 'button'){
+						// Renders the Link Button based on setup:
+						$html .= linkRender($item, $params);
+					};
+					$html .=	'</div>';
+				}else{
+					$html .= 	'<div class="'.$overlay_transition.' uk-overlay uk-overlay-'.$overlay_style.' uk-padding-small uk-position-'.$overlay_type.'">';
+					$html .= 	textCardRender($item, $params, $errors);
+					if($params->get('linktype') == 'button'){
+						// Renders the Link Button based on setup:
+						$html .= linkRender($item, $params);
+					};
+					$html .=	'</div>';
+				};
+
+			};
+            
+			if($params->get('linktype') == 'full'){
+				// if the whole card should be clickable
+				$html .= linkRender($item, $params);
+			};
+
+			if($overlay_type !== 'none') $html .= '</div>';
+
+			break;
+		case 'default_card':
+		default:
+			if(in_array($img->pos, array('top','bottom')) && $params->get('element_layout') === 'default_card' ){
+				//Switch for Cover image Container on Top or bottom
+				if($cover){
+					$html .= '<div class="uk-card-media-'.$img->pos.' uk-cover-container '.$height.'">';
+						$html .= '<img src="'.$img->url.'" width="100%" uk-cover alt="">';
+						$html .= '<canvas width="" height=""></canvas>';
+					$html .= '</div>';
+		
+				}else{
+					$html .= '<div class="uk-card-media-'.$img->pos.'">';
+						$html .= '<img src="'.$img->url.'" width="100%" alt="">';
+					$html .= '</div>';
+				};			
+			}
+			elseif(in_array($img->pos, array('left','right'))){
+				$classes = '';
+				if($img->pos == 'right') $classes .= 'uk-flex-last@s ';
+		
+				$html .= '<div class="'.$classes.'uk-card-media-'.$img->pos.' uk-cover-container '.$height.' uk-width-'.$params->get('image_container_width','1-3').'">';
+					$html .= '<img src="'.$img->url.'" width="100%" alt="" uk-cover>';
+					$html .= '<canvas width="600" height="400"></canvas>';
+				$html .= '</div>';
+			};
+	}
+
+	
 	return $html;
 };
 
@@ -420,40 +544,42 @@ function buildElement($item, $params, &$errors){
 
 	// Append Image in position top to container if not disabled in backend
 	if($img->src !== 'none' && in_array($img->pos, array('top','left','right'))){
-		$html .= imageCardRender($img, $params, $errors);
+		$html .= imageCardRender($item, $img, $params, $errors);
 	};
 
 	// Content if mode is set to default card
-	$html .= cardFieldsRender($item, $params, $errors);
+	$html .= '<div class="uk-position-relative uk-width-expand">';
+		$html .= cardFieldsRender($item, $params, $errors);
 
-	// Content if mode is set to default card
-	$html .= textCardRender($item, $params, $errors);
-	if($params->get('linktype') == 'button') {
-		if(intval($params->get('button_always_bottom'))){
-			$html .= '<div class="uk-padding"></div>'; // Padding for Absolute Positioned Button
-			$html .= '<div class="uk-position-bottom">' . linkRender($item, $params) . '</div>';
-		}else{
-			$html .= linkRender($item, $params);
+		// Content if mode is set to default card
+		if($params->get('element_layout') === 'default_card') $html .= textCardRender($item, $params, $errors);
+
+		if($params->get('linktype') == 'button' && $params->get('element_layout') !== 'image_card') {
+			if(intval($params->get('button_always_bottom'))){
+				$html .= '<div class="uk-padding"></div>'; // Padding for Absolute Positioned Button
+				$html .= '<div class="uk-position-bottom">' . linkRender($item, $params) . '</div>';
+			}else{
+				$html .= linkRender($item, $params);
+			};
 		};
-	};
+	$html .= '</div>';
 
 	// End of Content
 
 	// Append Image in position bottom to container if not disabled in backend
 	if($img->src !== 'none' && $img->pos == 'bottom'){
-		$html .= imageCardRender($img);
+		$html .= imageCardRender($item, $img, $params, $errors);
 	};
 
 	
-	// Link
-	if($params->get('linktype') == 'full'){
+	// Full Card Link if Card is not image card and img position is top or bottom
+	if($params->get('linktype') == 'full' && $params->get('element_layout') !== 'image_card'){
 		// if the whole card should be clickable
-		if(in_array($img->pos, array('top','bottom')) || $params->get('element_layout') == 'image_card')
+		if(in_array($img->pos, array('top','bottom')))
 		{
 			$html .= linkRender($item, $params);
 		}
 	};
-
 	// Debug Section inside container:
 	if(intval($params->get('nxdebug', 0))){
 		$html .=		'<div class="nx-debug uk-margin">';
@@ -463,9 +589,10 @@ function buildElement($item, $params, &$errors){
 	// End of Debug Section
 
 	$html.= 		'</div>';
-	if($params->get('linktype') == 'full'){
-		// Append Modal Link if the card has grid layout
-		if(in_array($img->pos, array('left','right')) && $params->get('element_layout') !== 'image_card') {
+
+	// Append Full Card Link if the card has grid layout with image left or right and its not an image Card type
+	if($params->get('linktype') == 'full' && $params->get('element_layout') !== 'image_card'){
+		if(in_array($img->pos, array('left','right'))) {
 			$html .= linkRender($item, $params);
 		};
 	};
@@ -476,14 +603,16 @@ function buildElement($item, $params, &$errors){
 function buildModal($item, $params, $errors){
 	// First we create an array that holds all fields we want to display in the modal (Backend Setting)
 	$nxdebug = $params->get('nxdebug',0);
+	// Customfield rules
+	$rules = $params->get('customfield_rules',[]);
 	$construct = '';
 	// get the image url based on setup
 	$img = imagebysetup($item, 'modal', $params, $errors);
 
 	if($img->use){
 
-		$img_in_construct = '<div class="uk-grid-collapse uk-child-width-1-1@s uk-child-width-1-2@m" uk-grid>'.				
-								'<div class="uk-card-media-left uk-cover-container">'.
+		$img_in_construct = '<div class="uk-grid-collapse uk-child-width-1-1@s uk-child-width-expand@m" uk-grid>'.				
+								'<div class="uk-card-media-left uk-cover-container uk-width-'.$params->get('modal_image_container_width','1-2').'@m">'.
 									'<img src="'.$img->url.'" alt="Spielerfoto" uk-cover>'.
 									'<canvas width="600" height="400"></canvas>'.
 								'</div>';
@@ -495,7 +624,7 @@ function buildModal($item, $params, $errors){
 	if(!empty($params->get('title_to_render_modal', ''))){
 		$titlesString = trim($params->get('title_to_render_modal', ''));
 		$array_of_titles = multiexplode(array(" ","\r\n"), $titlesString);
-		$construct .= '<div class="uk-padding-small"><h3>';
+		$construct .= '<div class="uk-padding-small"><'.$params->get('modal_title_tag','h3').' class="'.$params->get('modal_title_cls','').'">';
 		$i = 0;
 		foreach($array_of_titles as $fieldname){
 			if(array_key_exists($fieldname, $item->fields)){
@@ -507,7 +636,7 @@ function buildModal($item, $params, $errors){
 				if($nxdebug) $construct.= '<span class="uk-alert uk-alert-warning">'.$fieldname.' not exists</span>';
 			};
 		};
-		$construct .= '</h3></div>';
+		$construct .= '</'.$params->get('modal_title_tag','h3').'></div>';
 	};
 
 	if(!empty($params->get('fields_to_render_modal')))
@@ -517,9 +646,18 @@ function buildModal($item, $params, $errors){
 		$construct .= '<table class="uk-table uk-table-divider"><tbody>';
 		foreach($array_of_fields as $fieldname){
 			if(array_key_exists($fieldname, $item->fields)){
+				
 				$label = $item->fields[$fieldname]->label;
-				$value = $item->fields[$fieldname]->value;
-				$construct .= '<tr><td>'.$label.'</td><td>'.$value.'</td>';
+
+				$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+				$value = customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+
+				$construct .= '<tr>';
+				if(intval($params->get('fields_modal_display_label',1))){
+					$construct .= '<td>'.$label.'</td>';
+				};
+
+				$construct .= '<td>'.$value.'</td>';
 				if($nxdebug) $construct.= '<td class=" uk-table-shrink uk-alert uk-alert-warning">'.$fieldname.'</td>';
 				$construct .= '</tr>';
 			}else{
@@ -529,12 +667,22 @@ function buildModal($item, $params, $errors){
 		$construct .= '</tbody></table>';
 	}else{
 		$error = '<b>No Customfields configured for display</b> - checkout manual to properly configure the module';
-	}
+	};
+
+	// Classes for Modal Container
+	$modal_cls = 'uk-flex-top ';
+
+	if($params->get('modal_container_type', 'container') === 'container'){
+		$modal_cls .= 'uk-modal-container ';
+	};
+
+	$modal_cls .= $params->get('modal_container_cls');
 
 	//if(strlen($error)>1) $construct .= $error;
 	
-	$html = 	'<div id="nx-modal-'.$item->content_item_id.'" class="uk-flex-top" uk-modal>';
+	$html = 	'<div id="nx-modal-'.$item->content_item_id.'" class="'.$modal_cls.'" uk-modal>';
 	$html .= 		'<div class="uk-modal-dialog uk-margin-auto-vertical">';
+	$html .= 			'<button class="uk-modal-close-default" type="button" uk-close></button>';
 	$html .= 				$img_in_construct;
 	$html .= 				'<div>';
 	$html .= 					$construct;
@@ -553,6 +701,7 @@ if($nxdebug){/*
 	</div>
 <?php */
 };
+
 ?>
 <div class="nx-tagsselectedadvanced nx-tags-grid-member uk-position-relative">
 	<div class="uk-child-width-1-1@s uk-child-width-1-<?php echo $grid_columns . '@m ' . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid>

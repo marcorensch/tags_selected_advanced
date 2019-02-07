@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset>
+        <field name="customfield_for_rule" type="text" label="Customfield Name" description="The Name of the customfield which the rule has to apply" hint="name-of-customfield" />
+        <field name="rule_type" type="list" label="Rule Type" description="Which rule should be used?" default="before">
+            <option value="before">before</option>
+            <option value="after">after</option>
+        </field>
+        <field name="rule_string_to_add" type="text" label="String to add" description="The string to add based on rule settings" hint="your string" />
+        <field name="rule_target" type="list" label="Rule Target" description="Where should the rule take effect?" default="always">
+            <option value="always">always</option>
+            <option value="card">Card</option>
+            <option value="modal">Modal</option>
+        </field>
+    </fieldset>
+</form>

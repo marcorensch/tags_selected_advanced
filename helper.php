@@ -114,16 +114,38 @@ abstract class ModTagsselectedHelper
 		// Sort Array
 		// Sort the multidimensional array if a field is setted up
 		$orderByField = $params->get('order_by_customfield');
-		usort($articles_by_tags, function($a, $b) use ($orderByField){
+		usort($articles_by_tags, function($a, $b) use ($orderByField, $params){
 			if(empty($orderByField)){
-				return $a->content_item_id > $b->content_item_id;
+				switch($params->get('order_direction','asc')){
+					case 'desc':
+						return $a->content_item_id > $b->content_item_id;
+					break;
+					case 'asc':
+					default:
+						return $a->content_item_id < $b->content_item_id;
+				};
+				
 			}else{
 				if (array_key_exists($orderByField, $a->fields)) {
-					return $a->fields[$orderByField]->rawvalue > $b->fields[$orderByField]->rawvalue;
+					switch($params->get('order_direction','asc')){
+						case 'desc':
+							return $a->fields[$orderByField]->rawvalue < $b->fields[$orderByField]->rawvalue;
+						break;
+						case 'asc':
+						default:
+							return $a->fields[$orderByField]->rawvalue > $b->fields[$orderByField]->rawvalue;
+					}
 				}else
 				{
 					echo '<script type="text/javascript">console.log("Field '.$orderByField.' not found");</script>';
-					return $a->content_item_id > $b->content_item_id;
+					switch($params->get('order_direction','asc')){
+						case 'desc':
+							return $a->content_item_id > $b->content_item_id;
+						break;
+						case 'asc':
+						default:
+							return $a->content_item_id < $b->content_item_id;
+					};
 				}
 			}
 		});

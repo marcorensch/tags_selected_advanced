@@ -46,32 +46,21 @@
 					<option value="0">All Tags has to match</option>
 				</field>
 				<field type="text" name="order_by_customfield" label="Order by" description="Name of customfield to sort by if not set article id is used to sort by" hint="name-of-field" />
+				<field name="order_direction" type="radio" default="asc" label="Order Direction" description="Ordering Direction ascending or descending" class="btn-group">
+					<option value="asc">ASC</option>
+					<option value="desc">DESC</option>
+				</field>
+
 				<field name="layoutChoice" type="list" default="default" label="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_LABEL" description="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_DESCRIPTION" class="span3 small" >
 					<option value="default">Simple Listing</option>
 					<option value="uikit_slideshow">Slideshow (UIkit 3)</option>
 					<option value="uikit_grid">Grid (UIkit 3)</option>
 					<!--<option value="default4">default4</option>-->
 				</field>
-				<field name="overlay_transition" label="Overlay Animation" description="Animation type of the overlay" type="list" default="uk-transition-fade" class="span3">
-					<option value="uk-transition-fade">fade</option>
-					<option value="uk-transition-scale-up">scale up</option>
-					<option value="uk-transition-scale-down">scale down</option>
-					<option value="uk-transition-slide-top">slide top</option>
-					<option value="uk-transition-slide-top-small">slide top small</option>
-					<option value="uk-transition-slide-top-medium">slide top medium</option>
-					<option value="uk-transition-slide-bottom">slide bottom</option>
-					<option value="uk-transition-slide-bottom-small">slide bottom small</option>
-					<option value="uk-transition-slide-bottom-medium">slide bottom medium</option>
-					<option value="uk-transition-slide-left">slide left</option>
-					<option value="uk-transition-slide-left-small">slide left small</option>
-					<option value="uk-transition-slide-left-medium">slide left medium</option>
-					<option value="uk-transition-slide-right">slide right</option>
-					<option value="uk-transition-slide-right-small">slide right small</option>
-					<option value="uk-transition-slide-right-medium">slide right medium</option>
-				</field>
+				
 <!-- Image Settings -->
 				<field type="spacer" hr="true"/>
-				<field type="spacer" label="Image Options" class=""/>
+				<field type="spacer" label="Image Setup" class=""/>
 				<field name="image_source" label="Image Source" description="Select the source for the image" type="list" default="none" class="span3">
 					<option value="none">Do not display an image</option>
 					<option value="customfield">Customfield (define below)</option>
@@ -79,10 +68,10 @@
 					<option value="image_fulltext">Full Article Image</option>
 				</field>
 			
-				<field type="text" name="customfield_for_image" label="Image Field" description="customfield which contains the image url" hint="name-of-field" class="span3"/>
+				<field showon="image_source:customfield" type="text" name="customfield_for_image" label="Image Field" description="customfield which contains the image url" hint="name-of-field" class="span3"/>
 <!-- Content Settings -->
 				<field type="spacer" hr="true"/>
-				<field type="spacer" name="content" label="Content General" />
+				<field type="spacer" name="content" label="Content Setup" />
 				<field name="content_alignement" type="list" label="Content Alignement" description="" default="left" class="span3">
 					<option value="left">left</option>
 					<option value="center">center</option>
@@ -117,12 +106,24 @@
 				</field>
 				<field showon="element_text_src:customfield" type="text" name="customfield_for_text" label="Customfield for Text" description="customfield which contains the Text / Introtext" hint="name-of-field" class="span3"/>
 				<field showon="element_text_src:customfield,article_text" name="content_text_truncate" type="text" label="Max Characters" description="amount of max characters before truncate (0 = no truncation at all)" default="400" class="span1" filter="integer" />
+				<field name="text_tag" type="list" label="Text Tag" description="Container Element type for text" default="span" class="span3">
+					<option value="h1">H1</option>
+					<option value="h2">H2</option>
+					<option value="h3">H3</option>
+					<option value="h4">H4</option>
+					<option value="h5">H5</option>
+					<option value="h6">H6</option>
+					<option value="p">Paragraph</option>
+					<option value="span">Span</option>
+					<option value="div">Div</option>
+				</field>
+				<field type="text" name="text_cls" label="Custom text classes" description="Additional classes separated by space" hint="uk-text-small class-b" default="" class="span3"/>
 
 				<field type="spacer" name="content_cf" label="Front Customfields Options" />
 				<field
 					name="fields_to_render_front"
 					type="textarea" rows="6"
-					label="Fields to render in Front"
+					label="Fields used"
 					description="Which Fields should be rendered in Front? (one field-name per row or seperated by spaces)"
 					hint="" />
 				<field name="fields_front_display_label" type="radio" default="0" label="Display Label" description="Should the Field be rendered including label?" class="btn-group span3">
@@ -132,15 +133,16 @@
 
 <!-- Link Settings --> 
 				<field type="spacer" hr="true"/>
-				<field type="spacer" name="linksettigs_spacer" label="Link Settings" />
-				<field name="link_mode" label="Link Mode" default="article" description="" type="list" class="span3">
-					<option value="article">Article Link</option>
-					<option value="modal">Modal Link (check Modal settings Tab)</option>
-				</field>
+				<field type="spacer" name="linksettigs_spacer" label="Link Setup" />
 				<field name="linktype" label="Link Type" default="full" description="" type="list" class="span3">
 					<option value="full">Full</option>
 					<option value="button">Button</option>
 				</field>
+				<field name="link_mode" label="Link Mode" default="article" description="" type="list" class="span3">
+					<option value="article">Article Link</option>
+					<option value="modal">Modal Link (check Modal settings Tab)</option>
+				</field>
+				
 				
 				<field showon="linktype:button" name="linktext" label="Linktext" default="Read more" description="" type="text" class="span3"/>
 
@@ -156,7 +158,7 @@
 					<option value="uk-button-medium">default</option>
 					<option value="uk-button-large">large</option>
 				</field>
-				<field name="button_width" type="list" label="Button Width" description="" default="uk-width-1-2" class="span3">
+				<field showon="linktype:button" name="button_width" type="list" label="Button Width" description="" default="uk-width-1-2" class="span3">
 					<option value="uk-width-1-1">100%</option>
 					<option value="uk-width-3-4">75%</option>
 					<option value="uk-width-1-2">50%</option>
@@ -169,12 +171,12 @@
 					<option value="uk-padding">default</option>
 					<option value="uk-padding-large">large</option>
 				</field>
-				<field name="button_alignement" type="list" label="Button Alignement" description="" default="center" class="span3">
+				<field showon="linktype:button" name="button_alignement" type="list" label="Button Alignement" description="" default="center" class="span3">
 					<option value="left">left</option>
 					<option value="center">center</option>
 					<option value="right">right</option>
 				</field>
-				<field name="button_always_bottom" type="radio" label="Positioning on the bottom" description="" default="1" class="btn-group">
+				<field showon="linktype:button" name="button_always_bottom" type="radio" label="Positioning on the bottom" description="" default="1" class="btn-group">
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
@@ -183,6 +185,11 @@
 					<option value="_parent">parent</option>
 					<option value="_blank">blank</option>
 				</field>
+			</fieldset>
+			<fieldset name="tab_customfield_rules">
+				<field name="customfield_rules" type="subform"
+    				formsource="modules/mod_tags_selected_advanced/forms/customRules.xml" multiple="true"
+    				label="Add Rule" description="" />
 			</fieldset>
 			<fieldset name="slideshow">
 				<field
@@ -280,8 +287,8 @@
 					<option value="medium">default</option>
 					<option value="large">large</option>
 				</field>
-
-
+				<field showon="element_layout:default_card" type="spacer" name="image_settings_spacer_hr" hr="true" class="" />
+				<field showon="element_layout:default_card" type="spacer" name="image_settings_spacer" label="Image Settings" />
 				<field showon="element_layout:default_card" name="image_pos" label="Image Positioning" description="Select the Image Positioning in Grid / Card Layout" type="list" default="top">
 					<option value="top">top</option>
 					<option value="left">left</option>
@@ -289,16 +296,69 @@
 					<option value="bottom">bottom</option>
 				</field>
 
-				<field showon="image_pos:top,bottom[OR]element_layout:image_card" name="image_cover" label="Image Cover" description="Select if the image should cover the available space (setted up below)" type="list" default="1">
+				<field showon="image_pos:top,bottom[AND]element_layout:default_card" name="image_cover" label="Image Cover" description="Select if the image should cover the available space (setted up below)" type="list" default="1">
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
 
-				<field showon="image_pos:top,bottom[OR]element_layout:default_card[AND]image_cover:1" name="image_container_height" label="Image Cover height" description="Here you can define a fixed height for the image container" type="list" default="none">
+				<field showon="element_layout:default_card" name="image_container_height" label="Image Cover height" description="Here you can define a fixed height for the image container" type="list" default="none">
 					<option value="none">not set</option>
 					<option value="small">small</option>
 					<option value="medium">medium</option>
 					<option value="large">large</option>
+				</field>
+
+				<field showon="element_layout:default_card[AND]image_pos:left,right" name="image_container_width" label="Image Width" description="Here you can define the width for the image" type="list" default="1-3">
+					<option value="small">small</option>
+					<option value="medium">medium</option>
+					<option value="large">large</option>
+					<option value="1-4">fourth</option>
+					<option value="1-2">half</option>
+					<option value="1-3">third</option>
+				</field>
+
+				<!-- Overlay Settings -->
+				<field showon="element_layout:image_card" type="spacer" name="overlay_spacer_line" hr="true" class="" />
+				<field showon="element_layout:image_card" type="spacer" name="overlay_spacer_label" label="Overlay Settings" />
+				<field showon="element_layout:image_card" name="overlay_type" label="Overlay Type" description="Type of overlay" type="list" default="bottom" class="">
+					<option value="none">none</option>
+					<option value="top">top</option>
+					<option value="center">center</option>
+					<option value="bottom">bottom</option>
+					<option value="cover">cover</option>
+				</field>
+
+				<field showon="element_layout:image_card[AND]overlay_type:cover" name="overlay_content_position" label="Overlay Content" description="Style of overlay content" type="list" default="center" class="">
+					<option value="top">top</option>
+					<option value="center">center</option>
+					<option value="bottom">bottom</option>
+				</field>
+				<field showon="element_layout:image_card" name="overlay_style" label="Overlay Style" description="Style of overlay" type="list" default="default" class="">
+					<option value="default">default</option>
+					<option value="primary">primary</option>
+				</field>
+				<field showon="element_layout:image_card" name="overlay_content_style" label="Overlay Content Style" description="Style of overlay content" type="list" default="default" class="">
+					<option value="default">not set</option>
+					<option value="light">light</option>
+					<option value="dark">dark</option>
+				</field>
+				<field showon="element_layout:image_card" name="overlay_transition" label="Overlay Animation" description="Animation type of the overlay" type="list" default="uk-transition-fade" class="">
+					<option value="none">none</option>
+					<option value="uk-transition-fade">fade</option>
+					<option value="uk-transition-scale-up">scale up</option>
+					<option value="uk-transition-scale-down">scale down</option>
+					<option value="uk-transition-slide-top">slide top</option>
+					<option value="uk-transition-slide-top-small">slide top small</option>
+					<option value="uk-transition-slide-top-medium">slide top medium</option>
+					<option value="uk-transition-slide-bottom">slide bottom</option>
+					<option value="uk-transition-slide-bottom-small">slide bottom small</option>
+					<option value="uk-transition-slide-bottom-medium">slide bottom medium</option>
+					<option value="uk-transition-slide-left">slide left</option>
+					<option value="uk-transition-slide-left-small">slide left small</option>
+					<option value="uk-transition-slide-left-medium">slide left medium</option>
+					<option value="uk-transition-slide-right">slide right</option>
+					<option value="uk-transition-slide-right-small">slide right small</option>
+					<option value="uk-transition-slide-right-medium">slide right medium</option>
 				</field>
 				
 			</fieldset>
@@ -311,12 +371,29 @@
             description="Which Fields should be rendered as Modal Title? (one field-name per row or seperated by spaces)"
 			hint="field-name-a field-name-b" />
 
+			<field name="modal_title_tag" type="list" label="Modal Title Tag" description="Style for Modal Title" default="h3">
+				<option value="h1">H1</option>
+				<option value="h2">H2</option>
+				<option value="h3">H3</option>
+				<option value="h4">H4</option>
+				<option value="h5">H5</option>
+				<option value="h6">H6</option>
+				<option value="p">Paragraph</option>
+				<option value="span">Span</option>
+				<option value="div">Div</option>
+			</field>
+			<field type="text" name="modal_title_cls" label="Class for Modal Title" description="space separated list of class names" hint="my-class your-class" />
 			<field
             name="fields_to_render_modal"
             type="textarea" rows="6"
             label="Fields to render in Modal"
             description="Which Fields should be rendered in Modal? (one field-name per row or seperated by spaces)"
 			hint="field-name-a field-name-b" />
+
+			<field name="fields_modal_display_label" type="radio" default="1" label="Display Label" description="Should the Field(s) be rendered including label?" class="btn-group span3">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
+				</field>
 
 			<field name="image_in_modal" label="Display Image in Modal" description="Should the Modal contain an image" type="list" default="none">
 				<option value="none">no Image</option>
@@ -325,8 +402,23 @@
 				<option value="image_fulltext">Full Image</option>
 				<option value="image_intro">Intro Image</option>
 			</field>
-			<field showon="image_in_modal:customfield" type="text" name="customfield_for_modal_image" label="Customfield for Image" description="customfield which contains the Image" hint="name-of-field" class="span3"/>
+			<field showon="image_in_modal:customfield" type="text" name="customfield_for_modal_image" label="Customfield for Image" description="customfield which contains the Image" hint="name-of-field" />
+
+			<field showon="image_in_modal!:none" name="modal_image_container_width" label="Image Width" description="Here you can define the width for the image" type="list" default="1-2">
+					<option value="small">small</option>
+					<option value="medium">medium</option>
+					<option value="large">large</option>
+					<option value="1-4">fourth</option>
+					<option value="1-2">half</option>
+					<option value="1-3">third</option>
+				</field>
 			
+			<field name="modal_container_type" label="Modal Type" description="" type="list" default="container">
+				<option value="default">Default</option>
+				<option value="container">Container (wider)</option>
+			</field>
+
+			<field type="text" name="modal_container_cls" label="Additional Classes for Modal" description="space separated list of class names" hint="my-class your-class" class="span3"/>
 
 			</fieldset>
 
