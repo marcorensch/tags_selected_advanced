@@ -53,8 +53,8 @@
 
 				<field name="layoutChoice" type="list" default="default" label="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_LABEL" description="MOD_TAGS_SELECTED_ADVANCED_TAG_LAYOUT_DESCRIPTION" class="span3 small" >
 					<option value="default">Simple Listing</option>
-					<option value="uikit_slideshow">Slideshow (UIkit 3)</option>
-					<option value="uikit_grid">Grid (UIkit 3)</option>
+					<option value="slideshow">Slideshow (UIkit 3)</option>
+					<option value="grid">Grid (UIkit 3)</option>
 					<!--<option value="default4">default4</option>-->
 				</field>
 				
@@ -118,7 +118,20 @@
 					<option value="div">Div</option>
 				</field>
 				<field type="text" name="text_cls" label="Custom text classes" description="Additional classes separated by space" hint="uk-text-small class-b" default="" class="span3"/>
+				<!-- Meta -->
+				<field type="spacer" name="content_meta" label="Meta Display Options" />
+				<field type="list" name="meta_section" label="Meta Display" description="Define which Information should be displayed as meta" default="customfield">
+					<option value="none">Not used</option>
+				 	<option value="customfield">Customfield (define below)</option>
+					<option value="article_title">Article Title</option>
+					<option value="author">Author</option>
+					<option value="created">Date created</option>
+				</field>
+				<field showon="meta_section:customfield" type="text" name="meta_cf_name" label="Fieldname for Meta" description="Define Custom Field Name for Meta"  hint="field-name-a field-name-b" class="inputbox" />
+				<field showon="meta_section:customfield,article_title" name="meta_text_truncate" type="text" label="Max Characters" description="amount of max characters before truncate (0 = no truncation at all)" default="100" class="span1" filter="integer" />
+				<field showon="" name="meta_text_cls" type="text" label="CSS Classes" description="Additional CSS Classes for Meta, separated by space" hint="uk-text-meta" />
 
+<!-- additional Customfields -->
 				<field type="spacer" name="content_cf" label="Front Customfields Options" />
 				<field
 					name="fields_to_render_front"
@@ -126,6 +139,11 @@
 					label="Fields used"
 					description="Which Fields should be rendered in Front? (one field-name per row or seperated by spaces)"
 					hint="" />
+				<field name="fields_front_shortener" type="radio" default="0" label="Mobile Shortener" description="Should the Field be shortened if multiple names given? (WordA WordB)" class="btn-group span3">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
+				</field>
+				<field showon="fields_front_shortener:1" name="shorten_to" type="text" label="Word to use" description="Which word should be used? (Text: wordA wordB ==> wordA = 0, wordB = 1) The selected Word will be used for Mobile Viewport" filter="integer" default="0" />
 				<field name="fields_front_display_label" type="radio" default="0" label="Display Label" description="Should the Field be rendered including label?" class="btn-group span3">
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
@@ -191,6 +209,7 @@
     				formsource="modules/mod_tags_selected_advanced/forms/customRules.xml" multiple="true"
     				label="Add Rule" description="" />
 			</fieldset>
+<!-- Slideshow TAB -->
 			<fieldset name="slideshow">
 				<field
 					name="slideshow_animation" label="Slide Animation" description="the way the slider works" type="list" default="medium">
@@ -241,6 +260,13 @@
 					<option value="none">none</option>
 				</field>
 
+				<field name="overlay_padding" label="Overlay padding" description="The padding of the overlay" type="list" default="small">
+					<option value="small">small</option>
+					<option value="medium">medium</option>
+					<option value="large">large</option>
+					<option value="remove">none</option>
+				</field>
+
 				<field name="slideshow_overlay_position" label="Overlay Position" description="The position of the overlay" type="list" default="bottom">
 					<option value="top">top</option>
 					<option value="top-left">top-left</option>
@@ -279,21 +305,7 @@
 
 				
 				<field name="customcss" label="Custom CSS" description="Inline custom CSS Styles for content area" type="textarea" default="" hint="margin-bottom:50px;" class="inputbox span3 small" />
-				<field type="spacer" name="slideshow_content_spacer_divider" hr="true" />
-				<field type="spacer" name="slideshow_content_spacer_name" label="Content Setup" />
-				<field name="slideshow_content_align" label="Alignement" description="Content Alignement on Slideshow" type="list" default="center">
-					<option value="left">left</option>
-					<option value="center">center</option>
-					<option value="right">right</option>
-				</field>
-				<field type="list" name="slideshow_meta_section" label="Meta Display" description="Define which Information should be displayed as meta" default="customfield">
-					<option value="none">Not used</option>
-				 	<option value="customfield">Customfield (define below)</option>
-					<option value="article_title">Article Title</option>
-					<option value="author">Author</option>
-					<option value="created">Date created</option>
-				</field>
-				<field showon="slideshow_meta_section:customfield" type="text" name="slideshow_meta_cf_name" label="Fieldname for Meta" description="Define Custom Field Name for Meta"  hint="field-name-a field-name-b" class="inputbox" />
+
 			</fieldset>
 			<fieldset name="grid">
 				<!-- UIkit GRID -->

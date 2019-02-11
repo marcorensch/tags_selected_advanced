@@ -57,18 +57,29 @@ $slideshow_autoplay = intval($params->get('slideshow_autoplay','1'));
 $slideshow_overlay_position = $params->get('slideshow_overlay_position','bottom');
 $slideshow_overlay_transition = $params->get('slideshow_overlay_transition','uk-transition-fade');
 $slideshow_overlay_width = $params->get('overlay_width','auto');
-$slideshow_overlay_setup = $params->get('overlay_margin','none');
-switch($slideshow_overlay_setup){
+$slideshow_overlay_margin_setup = $params->get('overlay_margin','none');
+switch($slideshow_overlay_margin_setup){
 	case 'none':
-		$slideshow_overlay_margin = '';
+		$overlay_margin = '';
 	break;
 	case 'medium':
-	$slideshow_overlay_margin = ' uk-margin-left uk-margin-right uk-margin-bottom uk-margin-top';
+		$overlay_margin = ' uk-margin-left uk-margin-right uk-margin-bottom uk-margin-top';
 	break;
 	default:
-	$slideshow_overlay_margin = ' uk-margin-'.$slideshow_overlay_setup.'-left uk-margin-'.$slideshow_overlay_setup . '-right uk-margin-'.$slideshow_overlay_setup . '-bottom uk-margin-'.$slideshow_overlay_setup . '-top';
+		$overlay_margin = ' uk-margin-'.$slideshow_overlay_setup.'-left uk-margin-'.$slideshow_overlay_setup . '-right uk-margin-'.$slideshow_overlay_setup . '-bottom uk-margin-'.$slideshow_overlay_setup . '-top';
 }
-$slideshow_c_alignement = $params->get('slideshow_content_align','center');
+$slideshow_overlay_padding_setup = $params->get('overlay_padding','small');
+switch($slideshow_overlay_padding_setup){
+	case 'remove':
+	case 'small':
+	case 'large':
+		$overlay_padding = 'uk-padding-'.$slideshow_overlay_padding_setup;
+	break;
+	case 'medium':
+	default:
+		$overlay_padding = 'uk-padding';
+};
+$alignement = $params->get('content_alignement','left');
 $moduleclass_sfx 	= htmlspecialchars($params->get('moduleclass_sfx'));
 
 // Customfields
@@ -77,5 +88,6 @@ $moduleclass_sfx 	= htmlspecialchars($params->get('moduleclass_sfx'));
 $nxdebug = intval($params->get('nxdebug','0'));
 
 $layout = $params->get('layoutChoice');
+if(in_array($layout, ['slideshow','grid'])) $layout = 'uikit_'.$layout;
 $items = ModTagsselectedHelper::getContentList($params);
 require JModuleHelper::getLayoutPath('mod_tags_selected_advanced', $layout);

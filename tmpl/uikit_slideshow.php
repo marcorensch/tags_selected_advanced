@@ -9,11 +9,12 @@
 
 defined('_JEXEC') or die;
 
-?>
-<?php JLoader::register('TagsHelperRoute', JPATH_BASE . '/components/com_tags/helpers/route.php'); ?>
-<?php include_once('helpers/substring_sentence.php'); ?>
+JLoader::register('TagsHelperRoute', JPATH_BASE . '/components/com_tags/helpers/route.php');
+include_once('helpers/substring_sentence.php'); 
 
-<?php
+// Stylesheet for responsive margin & padding
+$document = JFactory::getDocument();
+$document->addStyleSheet('modules/mod_tags_selected_advanced/tmpl/assets/css/responsive-margin-padding.css');
 
 ?>
 
@@ -34,38 +35,14 @@ defined('_JEXEC') or die;
 
 					if($params->get('image_source','none') !== 'none') echo '<img title="'.$item->core_title.'" alt="'.$item->core_title.'" src="'.$img[0].'" uk-cover>';
 
-						echo '<div class="uk-width-'.$slideshow_overlay_width.' '.$slideshow_overlay_margin.' uk-overlay uk-overlay-primary uk-position-'.$slideshow_overlay_position.' '.$slideshow_c_alignement.' '.$slideshow_overlay_transition.'">';
+						echo '<div class="uk-width-1-1@s uk-width-'.$slideshow_overlay_width.'@m '.$overlay_margin.' uk-margin-remove@s '.$overlay_padding.' uk-overlay uk-overlay-primary uk-position-'.$slideshow_overlay_position.' uk-text-'.$alignement.' '.$slideshow_overlay_transition.'">';
 						echo 	'<'.$header_tag.' class="uk-margin-remove">'.$item->core_title.'</'.$header_tag.'>';
-								if($params->get('slideshow_meta_section') !== 'none'){
-									echo  ModTagsselectedHelper::getMeta($item, $params);
+								if($params->get('meta_section') !== 'none'){
+									echo ModTagsselectedHelper::getMeta($item, $params);
 								};
-								/*
-								if($item->fieldData['team_a_points'] || $item->fieldData['team_b_points']){
-									echo 		'<div class="uk-width-1-1 uk-visible@l">'
-													.'<table class="uk-table uk-table-middle uk-table-justify"><tbody><tr><td class="uk-text-left uk-text-meta">'.$item->fieldData['team_a_name'].'</td><td class="uk-text-center uk-text-meta">'.$item->fieldData['team_a_points'].':'.$item->fieldData['team_b_points'].'</td><td class=" uk-text-right uk-text-meta">'.$item->fieldData['team_b_name'].'</td></tr></tbody></table>'
-												.'</div>';
-									echo '<div class="uk-flex uk-flex-center uk-flex-wrap uk-hidden@l">';
-										echo '<div class="uk-text-uppercase uk-text-small uk-text-bold" style="margin:2px;">'.ModTagsselectedHelper::secondWord($item->fieldData['team_a_name']).'</div>';
-										echo '<div class="uk-text-uppercase uk-text-small uk-text-bold" style="margin:2px;">'.$item->fieldData['team_a_points'].'</div>';
-										echo '<div class="uk-text-uppercase uk-text-small uk-text-bold" style="margin:2px;">:</div>';
-										echo '<div class="uk-text-uppercase uk-text-small uk-text-bold" style="margin:2px;">'.$item->fieldData['team_b_points'].'</div>';
-										echo '<div class="uk-text-uppercase uk-text-small uk-text-bold" style="margin:2px;">'.ModTagsselectedHelper::secondWord($item->fieldData['team_b_name']).'</div>';
-										
-									echo '</div>';
-
-
+								if(!empty($params->get('fields_to_render_front',''))){
+									echo ModTagsselectedHelper::fieldsRender($item, $params);
 								};
-
-								if($item->fieldData['shorttext_html']){
-									echo '<div class="uk-visible@m">';
-									if($content_text_truncate > 1){
-										echo substr_sentence($item->fieldData['shorttext_html'], 0, $content_sentence_truncate, $content_text_truncate);
-									}else{
-										echo $item->fieldData['shorttext_html'];
-									};
-									echo '</div>';
-								};
-							*/	
 						echo '</div>';
 
 					if($linktype == 'full'){
@@ -84,5 +61,5 @@ defined('_JEXEC') or die;
 
 <?php
 if($nxdebug){echo "<h2>nx-debug</h2><hr><h4>Parameters</h4>\n"; highlight_string("<?php\n\$data =\n" . var_export($params, true) . ";\n?>");};
-if($nxdebug){echo "<hr><h4>Article Setup</h4>\n"; highlight_string("<?php\n\$data =\n" . var_export($list, true) . ";\n?>");};
+if($nxdebug){echo "<hr><h4>Article Setup</h4>\n <pre>" . var_export($list, true) . "</pre>";};
 ?>

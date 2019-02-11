@@ -1,0 +1,8 @@
+@media (max-width: 960px) {
+    .nx-tags-slideshow .uk-padding-remove\@s {
+        padding: 0px !important;
+    }
+    .nx-tags-slideshow .uk-margin-remove\@s {
+        margin: 0px !important;
+    }
+}
