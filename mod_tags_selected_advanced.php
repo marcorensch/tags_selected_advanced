@@ -66,7 +66,7 @@ switch($slideshow_overlay_margin_setup){
 		$overlay_margin = ' uk-margin-left uk-margin-right uk-margin-bottom uk-margin-top';
 	break;
 	default:
-		$overlay_margin = ' uk-margin-'.$slideshow_overlay_setup.'-left uk-margin-'.$slideshow_overlay_setup . '-right uk-margin-'.$slideshow_overlay_setup . '-bottom uk-margin-'.$slideshow_overlay_setup . '-top';
+		$overlay_margin = ' uk-margin-'.$slideshow_overlay_margin_setup.'-left uk-margin-'.$slideshow_overlay_margin_setup . '-right uk-margin-'.$slideshow_overlay_margin_setup . '-bottom uk-margin-'.$slideshow_overlay_margin_setup . '-top';
 }
 $slideshow_overlay_padding_setup = $params->get('overlay_padding','small');
 switch($slideshow_overlay_padding_setup){

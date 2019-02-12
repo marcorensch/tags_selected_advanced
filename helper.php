@@ -67,12 +67,13 @@ class ModTagsselectedHelper
 
 
 		$articles_by_tags = $db->loadObjectList();		// Contains all matched Articles sorted by the selcted tags
-		var_dump($articles_by_tags);
 
 		// Define Model for CustomFields
 		$cfmodel =JModelLegacy::getInstance('Article', 'ContentModel', array('ignore_request'=>true));
 		$appParams = JFactory::getApplication()->getParams();
 		$cfmodel->setState('params', $appParams);
+
+		
 
 		foreach ($articles_by_tags as &$result)
 		{
@@ -81,11 +82,13 @@ class ModTagsselectedHelper
 			$item = $cfmodel->getItem($id);
 
 			// we get URL for this element
-			$url =  JRoute::_(ContentHelperRoute::getArticleRoute($id, 
-                      $item->catid, 
-					  $item->language));
+			$url =  JRoute::_(ContentHelperRoute::getArticleRoute($id, $item->catid, $item->language));
+			
+			$sql = "SELECT urls FROM #__content WHERE id = ".intval($id);
+			$db->setQuery($sql);
+			$articleUrls = $db->loadResult();
 					  
-			$urls = json_decode($result->item->urls);
+			$urls = json_decode($articleUrls);
 			// we get the CustomFields for this element
 			$jcFields = FieldsHelper::getFields('com_content.article',  $item, True);
 
@@ -402,6 +405,8 @@ class ModTagsselectedHelper
 		$rules = $params->get('customfield_rules',[]);
 		$html = '';
 		$error = '';
+
+		
 		// Prepare title based on setup
 		switch($params->get('element_title_src')){
 			case 'customfield':
@@ -493,10 +498,10 @@ class ModTagsselectedHelper
 			case 'default_card':
 			default:
 				$html .=	'<div class="uk-card-body uk-text-'.$alignement.' uk-position-relative">';
+				
 				if($nxdebug && !empty($error)) $html .= '<div class=""><div class="uk-alert uk-alert-danger">'.$error.'</div></div>';
 				$html .= 	'<'.$title_tag.' class="'.$title_cls.'">'.$title.'</'.$title_tag.'>';
 				$html .=		'<'.$text_tag.' class="'.$text_cls.'">';
-	
 				$html .=			$text.'</'.$text_tag.'>';
 				$html .=	'</div>';
 		};
@@ -545,7 +550,7 @@ class ModTagsselectedHelper
 						$html .= 	self::textCardRender($item, $params, $errors);
 						if($params->get('linktype') == 'button'){
 							// Renders the Link Button based on setup:
-							$html .= self::linkRender($item, $params);
+							$html .= self::linkRender($item, $params, null);
 						};
 						$html .=	'</div>';
 					}else{
@@ -553,7 +558,7 @@ class ModTagsselectedHelper
 						$html .= 	self::textCardRender($item, $params, $errors);
 						if($params->get('linktype') == 'button'){
 							// Renders the Link Button based on setup:
-							$html .= self::linkRender($item, $params);
+							$html .= self::linkRender($item, $params, null);
 						};
 						$html .=	'</div>';
 					};
@@ -562,7 +567,7 @@ class ModTagsselectedHelper
 				
 				if($params->get('linktype') == 'full'){
 					// if the whole card should be clickable
-					$html .= self::linkRender($item, $params);
+					$html .= self::linkRender($item, $params, null);
 				};
 	
 				if($overlay_type !== 'none') $html .= '</div>';
@@ -599,7 +604,7 @@ class ModTagsselectedHelper
 		return $html;
 	}
 
-	public static function linkRender($item, $params){
+	public static function linkRender($item, $params, $urlx){
 		$html = '';
 		$linktext = '';
 		$attr = '';
@@ -607,18 +612,32 @@ class ModTagsselectedHelper
 		$target= $params->get('linktarget','_blank');
 		$outer_start = '';
 		$outer_end = '';
+
+
 		
 		
 		// switch between Modes Link to display a modal or link to item 
-		switch($params->get('link_mode')){
-		case 'modal':
-			$link = '#nx-modal-'.$item->content_item_id;
-			$attr = 'uk-toggle';
-			break;
-		case 'article':
-		default:
-			$link = JRoute::_(TagsHelperRoute::getItemRoute($item->content_item_id, $item->core_alias, $item->core_catid, $item->core_language, $item->type_alias, $item->router)); 	// Default we use the item link for the article
-		}
+		if($urlx === null){
+			switch($params->get('link_mode')){
+				case 'modal':
+					$link = '#nx-modal-'.$item->content_item_id;
+					$attr = 'uk-toggle';
+					break;
+				case 'article':
+				default:
+					$link = JRoute::_(TagsHelperRoute::getItemRoute($item->content_item_id, $item->core_alias, $item->core_catid, $item->core_language, $item->type_alias, $item->router)); 	// Default we use the item link for the article
+			};
+		}else{
+			// Overwrite Link URL if $urlx is not false
+			var_dump($urlx);
+			if($urlx !== null) {
+				$link = $urlx;
+				$target = '_blankiblank';
+			};
+		};
+		
+
+		
 	
 		// switch between button or full element link rendering
 		switch($params->get('linktype')){
@@ -735,6 +754,57 @@ class ModTagsselectedHelper
 		// Builds the HTML Element for display
 		// get the image url based on setup
 		$img = self::imagebysetup($item, 'card', $params, $errors);
+
+		// URL A / B / C specific cases for badge
+		$badge='';
+		$urlids = ['urla','urlb','urlc'];
+		$urls = new StdClass();
+		$specUrl = null; 											// Last Special URL (if url A & URL B are setted up as external link urlb will be used!)
+
+		foreach($urlids as $id){
+			$object = new stdClass();
+			$object->name = $id;									// urlx
+			$textx = $id.'text';
+			$object->text = $item->urls->$textx;					// urlxtext
+			$object->link = $item->urls->$id;						// http:// OR false
+			$targetx = 'target'.substr($id, -1);
+			$object->target = $item->urls->$targetx; 				// targetx
+
+			$object->config = $params->get($id.'_config');
+			$badgetext = $id.'_badge_txt';
+			$object->txt_src = $params->get($id.'_text_src');
+			$object->badge_txt = $params->get($id.'_badge_txt');
+			$object->display = $params->get($id.'_external_dp');
+
+			$urls -> $id = $object;
+
+			// Special URL Setup:
+			if($params->get($id.'_config') !== '0' && $object->link !== false){
+				$specUrl = $object->link;
+			};
+		};
+		$badges = '';
+		foreach($urls as $url){
+			if($url->link === false || $url->config === '0' || $url->display === '0'){
+				continue;
+			}else{
+				switch($url->txt_src){
+					case 'article':
+						$badge_txt = $url->text;
+						break;
+					case 'module':
+					default:
+						$badge_txt = $url->badge_txt;
+				};
+				$badges .= '<div class="uk-text-right">'.$badge_txt.'</div>';
+			};
+		};
+		if(!empty($badges)){
+			$badge .= '<div class="uk-card-badge uk-label">'.$badges.'</div>';
+		};
+		//echo '<pre>' . var_export($item->urls, true) . '</pre>';
+		
+		if($params->get('nxdebug',0)){ echo '<pre>' . var_export($urls, true) . '</pre>';};
 	
 		$ukgrid = '';
 	
@@ -770,9 +840,9 @@ class ModTagsselectedHelper
 			if($params->get('linktype') == 'button' && $params->get('element_layout') !== 'image_card') {
 				if(intval($params->get('button_always_bottom'))){
 					$html .= '<div class="uk-padding"></div>'; // Padding for Absolute Positioned Button
-					$html .= '<div class="uk-position-bottom">' . self::linkRender($item, $params) . '</div>';
+					$html .= '<div class="uk-position-bottom">' . self::linkRender($item, $params, $specUrl) . '</div>';
 				}else{
-					$html .= self::linkRender($item, $params);
+					$html .= self::linkRender($item, $params, $specUrl);
 				};
 			};
 		$html .= '</div>';
@@ -790,31 +860,35 @@ class ModTagsselectedHelper
 			// if the whole card should be clickable
 			if(in_array($img->pos, array('top','bottom')))
 			{
-				$html .= self::linkRender($item, $params);
+				$html .= self::linkRender($item, $params, $specUrl);
 			}
 		};
-		// Debug Section inside container:
-		if(intval($params->get('nxdebug', 0))){
-			$html .=		'<div class="nx-debug uk-margin">';
-			$html .=			'<pre>' . var_export($item, true) . '</pre>';
-			$html .= 		'</div>';
-		};
-		// End of Debug Section
-	
-		$html.= 		'</div>';
+
+		// Add Badge
+		if(!empty($badge)) $html .= $badge;
+
+				// Debug Section inside container:
+				if(intval($params->get('nxdebug', 0))){
+					$html .=		'<div class="nx-debug uk-margin">';
+					$html .=			'<pre>' . var_export($item, true) . '</pre>';
+					$html .= 		'</div>';
+				};
+				// End of Debug Section
+			
+				$html.= 		'</div>';
 	
 		// Append Full Card Link if the card has grid layout with image left or right and its not an image Card type
 		if($params->get('linktype') == 'full' && $params->get('element_layout') !== 'image_card'){
 			if(in_array($img->pos, array('left','right'))) {
-				$html .= self::linkRender($item, $params);
+				$html .= self::linkRender($item, $params, $specUrl);
 			};
 		};
+
 		$html.= 	'</div>';
 		return $html;
 	}
 
 }
-
 class CardField{
 
 	public static function buildSimpleTable($item, $array_of_fields, $params){

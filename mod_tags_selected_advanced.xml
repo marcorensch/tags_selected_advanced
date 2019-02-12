@@ -204,13 +204,69 @@
 					<option value="_blank">blank</option>
 				</field>
 			</fieldset>
+<!-- Custom Rules Tab -->
 			<fieldset name="tab_customfield_rules">
+				<field type="spacer" name="rulesintro" label="MOD_TAGS_SELECTED_ADVANCED_RULES_INTRO" />
 				<field name="customfield_rules" type="subform"
     				formsource="modules/mod_tags_selected_advanced/forms/customRules.xml" multiple="true"
     				label="Add Rule" description="" />
 			</fieldset>
+<!-- URL Settings Tab -->
+			<fieldset name="tab_url_settings">
+				<field type="spacer" name="urlintro" label="MOD_TAGS_SELECTED_ADVANCED_URL_INTRO" />
+				<field type="spacer" name="urlatitlespacer" label="MOD_TAGS_SELECTED_ADVANCED_URL_A" />
+				<field type="list" name="urla_config" label="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG" description="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG_DESC" default="0">
+					<option value="0">ignore this field</option>
+					<option value="external">use as external link</option>
+					<option value="badge_only">Badge Info only</option>
+				</field>
+				<field showon="urla_config:external,badge_only" type="list" name="urla_external_dp" label="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY" description="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY_DESC" default="0">
+					<option value="0">no optical marker</option>
+					<option value="badge">display Badge</option>
+				</field>
+				<field showon="urla_config:external,badge_only" type="list" name="urla_text_src" label="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC" description="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC_DESC" default="module">
+					<option value="module">Module (define below)</option>
+					<option value="article">Article URL Title</option>
+				</field>
+				<field showon="urla_config:external,badge_only[AND]urla_external_dp:badge[AND]urla_text_src:module" type="text" name="urla_badge_txt" label="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT" description="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT_DESC" default="Badge" />
+				
+
+				<field type="spacer" name="urlbtitlespacer" label="MOD_TAGS_SELECTED_ADVANCED_URL_B" />
+				<field type="list" name="urlb_config" label="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG" description="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG_DESC" default="0">
+					<option value="0">ignore this field</option>
+					<option value="external">use as external link</option>
+					<option value="badge_only">Badge Info only</option>
+				</field>
+				<field showon="urlb_config:external,badge_only" type="list" name="urlb_external_dp" label="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY" description="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY_DESC" default="0">
+					<option value="0">no optical marker</option>
+					<option value="badge">display Badge</option>
+				</field>
+				<field showon="urlb_config:external,badge_only" type="list" name="urlb_text_src" label="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC" description="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC_DESC" default="module">
+					<option value="module">Module (define below)</option>
+					<option value="article">Article URL Title</option>
+				</field>
+				<field showon="urlb_config:external,badge_only[AND]urlb_external_dp:badge[AND]urlb_text_src:module" type="text" name="urlb_badge_txt" label="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT" description="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT_DESC" default="Badge" />
+
+				<field type="spacer" name="urlctitlespacer" label="MOD_TAGS_SELECTED_ADVANCED_URL_C" />
+				<field type="list" name="urlc_config" label="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG" description="MOD_TAGS_SELECTED_ADVANCED_URL_CONFIG_DESC" default="0">
+					<option value="0">ignore this field</option>
+					<option value="external">use as external link</option>
+					<option value="badge_only">Badge Info only</option>
+				</field>
+				<field showon="urlc_config:external,badge_only" type="list" name="urlc_external_dp" label="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY" description="MOD_TAGS_SELECTED_ADVANCED_URL_DISPLAY_DESC" default="0">
+					<option value="0">no optical marker</option>
+					<option value="badge">display Badge</option>
+				</field>
+				<field showon="urlc_config:external,badge_only" type="list" name="urlc_text_src" label="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC" description="MOD_TAGS_SELECTED_ADVANCED_URL_TXT_SRC_DESC" default="module">
+					<option value="module">Module (define below)</option>
+					<option value="article">Article URL Title</option>
+				</field>
+				<field showon="urlc_config:external,badge_only[AND]urlc_external_dp:badge[AND]urlc_text_src:module" type="text" name="urlc_badge_txt" label="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT" description="MOD_TAGS_SELECTED_ADVANCED_URL_BADGE_TXT_DESC" default="Badge" />
+
+			</fieldset>
 <!-- Slideshow TAB -->
 			<fieldset name="slideshow">
+				<field type="spacer" name="slideshowintro" label="MOD_TAGS_SELECTED_ADVANCED_SLIDE_INTRO" />
 				<field
 					name="slideshow_animation" label="Slide Animation" description="the way the slider works" type="list" default="medium">
 					<option value="slide">Slide</option>
@@ -309,6 +365,7 @@
 			</fieldset>
 			<fieldset name="grid">
 				<!-- UIkit GRID -->
+				<field type="spacer" name="gridintro" label="MOD_TAGS_SELECTED_ADVANCED_GRID_INTRO" />
 				<field
 					name="grid_columns" label="Grid Columns" description="Amount of Grid columns" type="list" default="3">
 					<option value="1">1</option>
@@ -431,6 +488,7 @@
 			</fieldset>
 <!-- Modal Settings -->
 			<fieldset name="modal_setup">
+			<field type="spacer" name="modalintro" label="MOD_TAGS_SELECTED_ADVANCED_MODAL_INTRO" />
 			<field
             name="title_to_render_modal"
             type="textarea" rows="6"
