@@ -15,6 +15,9 @@ include_once('helpers/substring_sentence.php');
 // Stylesheet for responsive margin & padding
 $document = JFactory::getDocument();
 $document->addStyleSheet('modules/mod_tags_selected_advanced/tmpl/assets/css/responsive-margin-padding.css');
+$document->addStyleSheet('modules/mod_tags_selected_advanced/tmpl/assets/css/slideshow.css');
+
+$err = 0;
 
 ?>
 
@@ -32,21 +35,34 @@ $document->addStyleSheet('modules/mod_tags_selected_advanced/tmpl/assets/css/res
 				$img = ModTagsselectedHelper::getImageUrl($item, $params->get('image_source','none'), $params->get('customfield_for_modal_image', null) );
 
 				echo '<li>';
+						if($params->get('image_source','none') !== 'none') echo '<img title="'.$item->core_title.'" alt="'.$item->core_title.'" src="'.$img[0].'" uk-cover>';
 
-					if($params->get('image_source','none') !== 'none') echo '<img title="'.$item->core_title.'" alt="'.$item->core_title.'" src="'.$img[0].'" uk-cover>';
+						echo '<div class="uk-width-1-1@s uk-width-'.$slideshow_overlay_width.'@m uk-overlay uk-overlay-default uk-position-'.$slideshow_overlay_position.$overlay_margin.' uk-margin-remove@s ">';
+							echo '<div class="'.$slideshow_overlay_transition.'">';
+								echo '<div class="uk-visible@m">';
+									if($params->get('meta_section') !== 'none'){
+										echo ModTagsselectedHelper::getMeta($item, $params);
+									};
+									if(!empty($params->get('fields_to_render_front',''))){
+										echo ModTagsselectedHelper::fieldsRender($item, $params);
+									};
+									
+								echo '</div>';
 
-						echo '<div class="uk-width-1-1@s uk-width-'.$slideshow_overlay_width.'@m '.$overlay_margin.' uk-margin-remove@s '.$overlay_padding.' uk-overlay uk-overlay-primary uk-position-'.$slideshow_overlay_position.' uk-text-'.$alignement.' '.$slideshow_overlay_transition.'">';
-						echo 	'<'.$header_tag.' class="uk-margin-remove">'.$item->core_title.'</'.$header_tag.'>';
-								if($params->get('meta_section') !== 'none'){
-									echo ModTagsselectedHelper::getMeta($item, $params);
-								};
-								if(!empty($params->get('fields_to_render_front',''))){
-									echo ModTagsselectedHelper::fieldsRender($item, $params);
-								};
+								echo ModTagsselectedHelper::textCardRender($item, $params, $err);
+							echo '</div>';
 						echo '</div>';
 
 					if($linktype == 'full'){
-						echo '<a target="'.$linktarget.'" class="uk-position-cover" href="'.JRoute::_(TagsHelperRoute::getItemRoute($item->content_item_id, $item->core_alias, $item->core_catid, $item->core_language, $item->type_alias, $item->router)).'"></a>';
+						if(!empty(ModTagsselectedHelper::urlxsetup($item, $params)->url)){
+							echo '<a target="_blank" class="uk-position-cover" href="'.ModTagsselectedHelper::urlxsetup($item, $params)->url.'"></a>';
+						}else{
+							echo '<a target="'.$linktarget.'" class="uk-position-cover" href="'.JRoute::_(TagsHelperRoute::getItemRoute($item->content_item_id, $item->core_alias, $item->core_catid, $item->core_language, $item->type_alias, $item->router)).'"></a>';
+						};
+						
+					};
+					if(!empty(ModTagsselectedHelper::urlxsetup($item, $params)->badge_inner)){
+						echo '<div class="uk-card-badge uk-label uk-position-top-right nx-slideshow-badge">'.ModTagsselectedHelper::urlxsetup($item, $params)->badge_inner. '</div>';
 					};
 					if($nxdebug) echo '<div class="uk-position-absolute uk-position-z-index">' . highlight_string("<?php\n\$data =\n" . var_export($item, true) . ";\n?>") . '</div>';
 				echo '</li>';

@@ -324,7 +324,12 @@ class ModTagsselectedHelper
 			// Check if there are grouped Fields to render (by comma)
 			if(strpos($fieldsString, ',') !== false){
 				// create resultgrid
-				$html = CardField::buildResultGrid($fieldsString, $item, $params);
+				$result = CardField::buildResultGrid($fieldsString, $item, $params);
+				if($result !== false){
+					$html = CardField::buildResultGrid($fieldsString, $item, $params);
+				}else{
+					$html = '';
+				};
 			}else{
 				// No grouped fields just space separated fieldnames
 				$array_of_fields = self::multiexplode(array(" ","\r\n"), $fieldsString);
@@ -374,7 +379,7 @@ class ModTagsselectedHelper
 				$html = $item->author;
 				break;
 			case 'created':
-				$date = ModTagsselectedHelper::firstWord($item->core_created_time);
+				$date = self::firstWord($item->core_created_time);
 				$html .= '<span class="uk-text-small">'.date('d. M Y', strtotime($date)).'</span>';
 			break;
 			default:
@@ -750,11 +755,7 @@ class ModTagsselectedHelper
 		return $html;
 	}
 
-	public static function buildGridElement($item, $params, &$errors){
-		// Builds the HTML Element for display
-		// get the image url based on setup
-		$img = self::imagebysetup($item, 'card', $params, $errors);
-
+	public static function urlxsetup($item, $params){
 		// URL A / B / C specific cases for badge
 		$badge='';
 		$urlids = ['urla','urlb','urlc'];
@@ -779,7 +780,7 @@ class ModTagsselectedHelper
 			$urls -> $id = $object;
 
 			// Special URL Setup:
-			if($params->get($id.'_config') !== '0' && $object->link !== false){
+			if($params->get($id.'_config') === 'external' && $object->link !== false){
 				$specUrl = $object->link;
 			};
 		};
@@ -803,6 +804,22 @@ class ModTagsselectedHelper
 			$badge .= '<div class="uk-card-badge uk-label">'.$badges.'</div>';
 		};
 		//echo '<pre>' . var_export($item->urls, true) . '</pre>';
+		$urlx = new stdClass();
+		$urlx->url = $specUrl;
+		$urlx->badge = $badge;
+		$urlx->badge_inner = $badges;
+
+		return $urlx;
+	}
+
+	public static function buildGridElement($item, $params, &$errors){
+		// Builds the HTML Element for display
+		// get the image url based on setup
+		$img = self::imagebysetup($item, 'card', $params, $errors);
+
+		$urlxsetup = self::urlxsetup($item, $params);
+		$badge = $urlxsetup->badge;
+		$specUrl = $urlxsetup->url;
 		
 		if($params->get('nxdebug',0)){ echo '<pre>' . var_export($urls, true) . '</pre>';};
 	
@@ -921,7 +938,7 @@ class CardField{
 	
 	public static function buildResultGrid($fieldsString, $item, $params){
 		// there are grouped fields
-		$outer = '<div class="uk-child-width-1-2 uk-grid-collapse" uk-grid>';
+		$outer = '<div class="uk-child-width-1-2 uk-grid-collapse uk-text-small" uk-grid>';
 		//echo 'fieldsString hat groups';
 		$array_of_groups = $array_of_groups = explode(',',$fieldsString);
 		//print_r($array_of_groups);
@@ -932,7 +949,10 @@ class CardField{
 			foreach($array_of_fields as $fieldname){
 				if(array_key_exists($fieldname, $item->fields)){
 					$value = $item->fields[$fieldname]->value;
-					if(intval($params->get('fields_front_shortener',0))){
+					if($value === ''){
+						return false;
+					}
+					if(intval($params->get('fields_front_shortener', 0))){
 						$value = ModTagsselectedHelper::displaywordn($value, intval($params->get('fields_front_shortener',0)));
 					}
 					$g_container .= '<div><div class="uk-padding-small">'.$value.'</div></div>';

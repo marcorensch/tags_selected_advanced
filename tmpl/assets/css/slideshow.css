@@ -1,0 +1,12 @@
+.nx-slideshow-badge {
+    margin: 1em;
+    font-size: 0.4em !important;
+}
+
+@media (min-width: 960px) {
+    .nx-slideshow-badge {
+        margin: 2.5em;
+    }
+}
+
+

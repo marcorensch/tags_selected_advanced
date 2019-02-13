@@ -5,6 +5,7 @@
         <field name="rule_type" type="list" label="Rule Type" description="Which rule should be used?" default="before">
             <option value="before">before</option>
             <option value="after">after</option>
+            
         </field>
         <field name="rule_string_to_add" type="text" label="String to add" description="The string to add based on rule settings" hint="your string" />
         <field name="rule_target" type="list" label="Rule Target" description="Where should the rule take effect?" default="always">

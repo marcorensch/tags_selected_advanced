@@ -67,7 +67,8 @@ switch($slideshow_overlay_margin_setup){
 	break;
 	default:
 		$overlay_margin = ' uk-margin-'.$slideshow_overlay_margin_setup.'-left uk-margin-'.$slideshow_overlay_margin_setup . '-right uk-margin-'.$slideshow_overlay_margin_setup . '-bottom uk-margin-'.$slideshow_overlay_margin_setup . '-top';
-}
+};
+
 $slideshow_overlay_padding_setup = $params->get('overlay_padding','small');
 switch($slideshow_overlay_padding_setup){
 	case 'remove':
