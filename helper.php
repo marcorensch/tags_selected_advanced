@@ -196,8 +196,6 @@ class ModTagsselectedHelper
 		
 		foreach($rules as $rule){
 			$rule_fieldname  = $rule->customfield_for_rule;
-
-			echo '<pre>' . var_export($rule, true) . '</pre>';
 	
 			if($rule_fieldname === $input->fieldname){
 				// Break if we are not in the correct context (modal / card / always)
