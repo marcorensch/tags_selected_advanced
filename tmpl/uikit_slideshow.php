@@ -24,7 +24,8 @@ $err = 0;
 <div class="nx-tagsselectedadvanced nx-tags-slideshow uk-position-relative">
 	<div uk-slideshow="
 				animation: <?php echo $slideshow_animation; ?>; 
-				autoplay: <?php echo $slideshow_autoplay; ?>; 
+				autoplay: <?php echo $slideshow_autoplay; ?>;
+				<?php if(!$slideshow_viewportheight) echo 'max-height:'.$slideshowmaxheight; ?>; 
 				autoplay-interval: <?php echo $slideshow_interval; ?>; 
 				pause-on-hover:  <?php echo $slideshow_pause_on_hover; ?>" 
 				class="uk-position-relative uk-visible-toggle <?php echo $moduleclass_sfx; ?> "
@@ -37,7 +38,7 @@ $err = 0;
 				echo '<li>';
 						if($params->get('image_source','none') !== 'none') echo '<img title="'.$item->core_title.'" alt="'.$item->core_title.'" src="'.$img[0].'" uk-cover>';
 
-						echo '<div class="uk-width-1-1@s uk-width-'.$slideshow_overlay_width.'@m uk-overlay uk-overlay-default uk-position-'.$slideshow_overlay_position.$overlay_margin.' uk-margin-remove@s ">';
+						echo '<div class="uk-width-1-1@s uk-width-'.$slideshow_overlay_width.'@m uk-overlay uk-overlay-'.$slideshow_overlay_style.' uk-position-'.$slideshow_overlay_position.$overlay_margin.' uk-margin-remove@s ">';
 							echo '<div class="'.$slideshow_overlay_transition.'">';
 								echo '<div class="uk-visible@m">';
 									if($params->get('meta_section') !== 'none'){

@@ -63,7 +63,7 @@ class ModTagsselectedHelper
 
 			
 		$query=$tagsHelper->getTagItemsQuery($tagsToMatch, $typesr = null, $includeChildren = false, $orderByOption = 'c.core_title', $orderDir = 'ASC',$anyOrAll, $languageFilter = 'all', $stateFilter = '1');
-		$db->setQuery($query, 0, $maximum);
+		$db->setQuery($query, 0, 0); // was $maximum
 
 
 		$articles_by_tags = $db->loadObjectList();		// Contains all matched Articles sorted by the selcted tags
@@ -149,7 +149,8 @@ class ModTagsselectedHelper
 				}
 			}
 		});
-		return $articles_by_tags;
+		$articles_by_tags_sliced = array_slice($articles_by_tags, 0, $maximum);
+		return $articles_by_tags_sliced;
 	}
 
 	public static function firstWord($string){
@@ -559,7 +560,7 @@ class ModTagsselectedHelper
 						};
 						$html .=	'</div>';
 					}else{
-						$html .= 	'<div class="'.$overlay_transition.' uk-overlay uk-overlay-'.$overlay_style.' uk-padding-small uk-position-'.$overlay_type.'">';
+						$html .= 	'<div class="'.$overlay_transition.' uk-overlay uk-overlay-'.$overlay_style.' uk-'.$overlay_content_style.' uk-padding-small uk-position-'.$overlay_type.'">';
 						$html .= 	self::textCardRender($item, $params, $errors);
 						if($params->get('linktype') == 'button'){
 							// Renders the Link Button based on setup:
@@ -634,10 +635,10 @@ class ModTagsselectedHelper
 			};
 		}else{
 			// Overwrite Link URL if $urlx is not false
-			var_dump($urlx);
+			if($params->get('nxdebug',0)) echo '<div style="position:absolute; top:0;left:0;">'. var_dump($urlx) . '</div>';
 			if($urlx !== null) {
 				$link = $urlx;
-				$target = '_blankiblank';
+				$target = '_blank';
 			};
 		};
 		
@@ -837,9 +838,27 @@ class ModTagsselectedHelper
 		}
 		
 	
-		// Build the html container
-		$html = 	'<div class="uk-position-relative ">';
-		$html.= 		'<div class="'.$containerClasses.'" '.$ukgrid.'>';
+		// Build the html container 
+		if(intval($params->get('simpleMobile',0))){
+			$cls_large = ' uk-visible@m';
+		}else{
+			$cls_large = ' ';
+		}
+		
+
+		$html = 	'<div class="uk-position-relative">';
+		
+		// for mobile if
+		if($params->get('simpleMobile',0)){
+			$html .= 		'<div class="'.$containerClasses.' uk-card-body uk-margin-top-small uk-hidden@m">';
+			if(strlen($urlxsetup->badge_inner) > 3 ) $html .= 			'<div class="uk-card-badge uk-label nx-card-badge-mobile">'.$urlxsetup->badge_inner.'</div>';
+			$html .= 			'<h3 class="uk-h5 uk-margin-remove">'.$item->core_title.'</h3>';
+			$html .=			self::linkRender($item, $params, $specUrl);
+			$html .= 		'</div>';
+		};
+
+		//for Desktop
+		$html.= 		'<div class="'.$containerClasses . $cls_large.' " '.$ukgrid.'>';
 		
 	
 		// Append Image in position top to container if not disabled in backend
@@ -850,6 +869,9 @@ class ModTagsselectedHelper
 		// Content if mode is set to default card
 		$html .= '<div class="uk-position-relative uk-width-expand">';
 			$html .= self::fieldsRender($item, $params, $errors);
+			if($params->get('meta_section') !== 'none'){
+				$html .= self::getMeta($item, $params);
+			};
 	
 			// Content if mode is set to default card
 			if($params->get('element_layout') === 'default_card') $html .= self::textCardRender($item, $params, $errors);
@@ -864,7 +886,7 @@ class ModTagsselectedHelper
 			};
 		$html .= '</div>';
 	
-		// End of Content
+		// End of content
 	
 		// Append Image in position bottom to container if not disabled in backend
 		if($img->src !== 'none' && $img->pos == 'bottom'){

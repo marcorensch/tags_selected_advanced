@@ -21,14 +21,17 @@ $slideshow_pause_on_hover = $params->get('slideshow_pause_on_hover', 'true');
 $slideshow_interval = $params->get('slideshow_interval', 5000);
 $slideshow_viewportheight = intval($params->get('slideshow_viewportheight', '0'));
 $slideshowminheight = intval($params->get('slideshowminheight', '300'));
+$slideshowmaxheight = intval($params->get('slideshowmaxheight', '300'));
+
 if($slideshow_viewportheight){
 	$viewportsetup = 'uk-height-viewport="min-height:'.$slideshowminheight.'"';
+
 }else{
 	$viewportsetup = '';
 }
 
 //Grid
-$grid_columns = $params->get('grid_columns', '3');
+
 $grid_cutter = $params->get('grid_cutter', 'uk-grid-small');
 if(intval($params->get('grid_match'))){
 	$grid_match = ' uk-grid-match';
@@ -39,6 +42,13 @@ if($params->get('grid_divider')){
 	$grid_divider = ' uk-grid-divider ';
 }else{
 	$grid_divider = '';
+};
+
+// Columns
+if($params->get('simpleMobile')){
+	$grid_columns = 'uk-child-width-1-1@s uk-child-width-1-'.$params->get('grid_columns_m','3').'@m uk-child-width-1-'.$params->get('grid_columns_l','3').'@l ';
+}else{
+	$grid_columns = 'uk-child-width-1-'.$params->get('grid_columns_s','1').' uk-child-width-1-'.$params->get('grid_columns_s','1').'@s uk-child-width-1-'.$params->get('grid_columns_m','3').'@m uk-child-width-1-'.$params->get('grid_columns_l','3').'@l ';
 };
 $element_layout = $params->get('element_layout', 'image_card');
 $card_style = $params->get('card_style', 'default');
@@ -54,6 +64,7 @@ $buttonstyle = $params->get('buttonstyle', 'default');
 
 //Overlay & Content
 $slideshow_autoplay = intval($params->get('slideshow_autoplay','1'));
+$slideshow_overlay_style = $params->get('slideshow_overlay_style', 'default');
 $slideshow_overlay_position = $params->get('slideshow_overlay_position','bottom');
 $slideshow_overlay_transition = $params->get('slideshow_overlay_transition','uk-transition-fade');
 $slideshow_overlay_width = $params->get('overlay_width','auto');

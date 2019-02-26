@@ -26,7 +26,8 @@ if($nxdebug){/*
 
 ?>
 <div class="nx-tagsselectedadvanced nx-tags-grid-member uk-position-relative">
-	<div class="uk-child-width-1-1@s uk-child-width-1-<?php echo $grid_columns . '@m ' . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid>
+	
+	<div class="<?php echo $grid_columns . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid>
 	<?php
 		foreach($items as $element){
 			// Elements' Link
@@ -40,6 +41,7 @@ if($nxdebug){/*
 	?>
 
 	</div>
+	
 </div>
 
 

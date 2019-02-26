@@ -33,8 +33,8 @@
 					name="maximum"
 					type="integer"
 					default="5"
-					first="1"
-					last="100"
+					first="0"
+					last="500"
 					step="1"
 					class="span1"
 					label="MOD_TAGS_SELECTED_ADVANCED_MAX_LABEL"
@@ -153,6 +153,7 @@
 				<field type="spacer" hr="true"/>
 				<field type="spacer" name="linksettigs_spacer" label="Link Setup" />
 				<field name="linktype" label="Link Type" default="full" description="" type="list" class="span3">
+					<option value="none">None</option>
 					<option value="full">Full</option>
 					<option value="button">Button</option>
 				</field>
@@ -292,6 +293,7 @@
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
+				<field showon="slideshow_viewportheight:0" name="slideshowmaxheight" label="max height" description="max height of the slideshow" type="text" filter="integer" default="300" hint="300" class="span1" />
 				<field name="slideshowminheight" label="Min height" description="Min height of the slideshow" type="text" default="300" hint="300" filter="integer" class="inputbox span1 small" />
 				<field name="slideshow_overlay_style" label="Overlay Style" description="Overlay style Class" type="list" default="primary">
 					<option value="primary">Primary</option>
@@ -364,16 +366,39 @@
 
 			</fieldset>
 			<fieldset name="grid">
-				<!-- UIkit GRID -->
+<!-- UIkit GRID -->
 				<field type="spacer" name="gridintro" label="MOD_TAGS_SELECTED_ADVANCED_GRID_INTRO" />
 				<field
-					name="grid_columns" label="Grid Columns" description="Amount of Grid columns" type="list" default="3">
+					name="grid_columns_s" label="Grid Columns" description="Amount of Grid columns on mobile" type="list" default="1">
 					<option value="1">1</option>
 					<option value="2">2</option>
 					<option value="3">3</option>
 					<option value="4">4</option>
 					<option value="5">5</option>
 					<option value="6">6</option>
+				</field>
+				<field
+					name="grid_columns_m" label="Grid Columns M" description="Amount of Grid columns on desktops" type="list" default="3">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+				</field>
+				<field
+					name="grid_columns_l" label="Grid Columns L" description="Amount of Grid columns on large screens" type="list" default="3">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+				</field>
+				<field
+					showon="" name="simpleMobile" label="Simple on Mobile" description="Should the elements just be rendered simple on mobile? (one column with tiles and titles)" type="radio" default="1" class="btn-group">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
 				</field>
 				<field
 					name="grid_cutter" label="Grid Cutter" description="Grid Cutter Size" type="list" default="uk-grid-small">
@@ -399,6 +424,8 @@
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
+				
+				
 				<field
 					showon="element_layout:default_card" name="card_style" label="Card Style" description="Select the Card Type" type="list" default="default">
 					<option value="default">default</option>

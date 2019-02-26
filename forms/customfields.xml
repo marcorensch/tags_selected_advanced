@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
     <fieldset>
-    <field type="text" name="order_by_customfield" label="Order by" description="Name of Customfield to sort by if not set article id is used to sort by" hint="name-of-field">
     <!-- Date -->
         <field type="spacer" name="spacer_date" label="Date" />
           <field 
@@ -64,16 +63,6 @@
             type="textarea" rows="6"
             label="Shorttext Display Template"
             description="Custom HTML Layout (Placeholder: %value%)" />
-    </fieldset>
-
-    <fieldset>
-    <!-- Player Info -->
-        <field type="spacer" name="spacer_playerinfo" label="&lt;hr/&gt;Player Informations" />
-        <field
-            name="fieldlayout_playercfields"
-            type="textarea" rows="6"
-            label="Player Info Template Ordering"
-            description="Place here all fields that should be rendered" />
     </fieldset>
      
     

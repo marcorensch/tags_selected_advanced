@@ -5,4 +5,10 @@
     .nx-tags-slideshow .uk-margin-remove\@s {
         margin: 0px !important;
     }
+
+    .nx-card-badge-mobile {
+        position: absolute;
+        top: -8px !important;
+        right: 5px !important;
+    }
 }
