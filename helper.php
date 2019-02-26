@@ -196,11 +196,14 @@ class ModTagsselectedHelper
 		
 		foreach($rules as $rule){
 			$rule_fieldname  = $rule->customfield_for_rule;
+
+			echo '<pre>' . var_export($rule, true) . '</pre>';
 	
 			if($rule_fieldname === $input->fieldname){
 				// Break if we are not in the correct context (modal / card / always)
 				if($rule->rule_target !== 'always' && $rule->rule_target !== $input->context) break;
-				$setup = (object) ['mode' => $rule->rule_type, 'value' => $rule->rule_string_to_add];
+
+				$setup = (object) ['mode' => $rule->rule_type, 'value' => $rule->rule_string_to_add, 'replacemode' => $rule->rule_string_replace_with, 'find' => $rule->rule_string_to_find, 'replace' => $rule->rule_string_to_replace ];
 				// As function because we could make it bigger if necessary
 				$html = self::applyBasicRule($input, $setup);
 			
@@ -221,6 +224,15 @@ class ModTagsselectedHelper
 				break;
 			case 'after':
 				$string = trim($input->fieldvalue) . $setup->value;
+				break;
+			case 'replace':
+			if($setup->replacemode === 'string'){
+				$string = str_replace($setup->find , $setup->replace, trim($input->fieldvalue));
+			}else{
+				// Linebreak is only other option atm
+				$string = str_replace($setup->find , '<br />', trim($input->fieldvalue));
+			}
+				
 				break;
 			default:
 				$string = trim($input->fieldvalue);

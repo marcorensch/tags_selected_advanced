@@ -5,9 +5,16 @@
         <field name="rule_type" type="list" label="Rule Type" description="Which rule should be used?" default="before">
             <option value="before">before</option>
             <option value="after">after</option>
+            <option value="replace">replace</option>
             
         </field>
-        <field name="rule_string_to_add" type="text" label="String to add" description="The string to add based on rule settings" hint="your string" />
+        <field showon="rule_type:replace" name="rule_string_to_find" type="text" label="String to search" description="The part of the string we want to replace" filter="raw" hint="your string" />
+        <field showon="rule_type:replace" name="rule_string_replace_with" type="list" label="Replace with" description="Which rule should be used?" default="string">
+            <option value="string">String</option>
+            <option value="break">Linebreak</option>
+        </field>
+        <field showon="rule_type:replace[AND]rule_string_replace_with:string" name="rule_string_to_replace" type="text" label="Replacement" description="The part we but into the string" filter="raw" hint="your string" />
+        <field showon="rule_type!:replace" name="rule_string_to_add" type="text" label="String to add" description="The string to add based on rule settings" hint="your string" />
         <field name="rule_target" type="list" label="Rule Target" description="Where should the rule take effect?" default="always">
             <option value="always">always</option>
             <option value="card">Card</option>
