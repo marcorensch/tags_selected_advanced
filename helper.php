@@ -149,8 +149,12 @@ class ModTagsselectedHelper
 				}
 			}
 		});
-		$articles_by_tags_sliced = array_slice($articles_by_tags, 0, $maximum);
-		return $articles_by_tags_sliced;
+		if(intval($maximum) > 0){
+			$articles_by_tags_sliced = array_slice($articles_by_tags, 0, $maximum);
+			return $articles_by_tags_sliced;
+		}else{
+			return $articles_by_tags;
+		};
 	}
 
 	public static function firstWord($string){
