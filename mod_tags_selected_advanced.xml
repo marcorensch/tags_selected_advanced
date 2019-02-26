@@ -546,6 +546,48 @@
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
+			
+			<field type="spacer" name="fields_2_modal_spacer" label="Fields Section 2 in Modal" />
+			<field type="text" name="fields_2_modal_outer_container_class" label="Fields 2 Outter Container Class" description="" hint="my-class your-class" />
+			
+			
+			<field name="fields_2_modal_container" type="list" label="Fields 2 Container" description="Style for Fields 2 Modal Container" default="default">
+				<option value="nx-section">none</option>
+				<option value="uk-card-body">none with Spacer</option>
+				<option value="uk-card-body uk-card-default">Default</option>
+				<option value="uk-card-body uk-card-primary">Primary</option>
+				<option value="uk-card-body uk-card-secondary">Secondary</option>
+			</field>
+			<field type="text" name="fields_2_modal_container_class" label="Fields 2 Container Class" description="" hint="my-class your-class" />
+			
+			<field name="fields_2_modal_title_tag" type="list" label="Fields 2 Modal Title Tag" description="Style for Modal Title" default="h3">
+				<option value="h1">H1</option>
+				<option value="h2">H2</option>
+				<option value="h3">H3</option>
+				<option value="h4">H4</option>
+				<option value="h5">H5</option>
+				<option value="h6">H6</option>
+				<option value="p">Paragraph</option>
+				<option value="span">Span</option>
+				<option value="div">Div</option>
+			</field>
+
+			
+
+			<field type="text" name="fields_2_modal_title" label="Title for Fields 2" description="" hint="Sponsored by" />
+			<field type="text" name="fields_2_modal_title_class" label="Additional Classes for Fields 2 Title" description="" hint="my-class your-class" />
+
+			<field
+            name="fields_2_to_render_modal"
+            type="textarea" rows="6"
+            label="Fields 2 to render in Modal"
+            description="Which Fields should also be rendered in Modal? (one field-name per row or seperated by spaces)"
+			hint="field-name-a field-name-b" />
+
+			<field name="fields_2_modal_display_label" type="radio" default="1" label="Display Label in Fields 2" description="Should the Field(s) be rendered including label?" class="btn-group span3">
+					<option value="1">JYes</option>
+					<option value="0">JNo</option>
+				</field>
 
 			<field name="image_in_modal" label="Display Image in Modal" description="Should the Modal contain an image" type="list" default="none">
 				<option value="none">no Image</option>

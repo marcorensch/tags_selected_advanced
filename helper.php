@@ -730,6 +730,50 @@ class ModTagsselectedHelper
 		}else{
 			$error = '<b>No Customfields configured for display</b> - checkout manual to properly configure the module';
 		};
+
+		if(!empty($params->get('fields_2_to_render_modal'))){
+			$fieldsString = trim($params->get('fields_2_to_render_modal'));
+			$array_of_fields = self::multiexplode(array(" ","\r\n"), $fieldsString);
+
+			$has_value = false;
+
+			$cf2 = '<div class="uk-width-1-1 '.$params->get('fields_2_modal_outer_container_class').'">';
+			$cf2 .= '<div class="uk-card '.$params->get('fields_2_modal_container','').' '.$params->get('fields_2_modal_container_class').'">';
+			$cf2 .= '<'.$params->get('fields_2_modal_title_tag', 'h4').' class="'.$params->get('fields_2_modal_title_class', 'h4').'">'.$params->get('fields_2_modal_title').'</'.$params->get('fields_2_modal_title_tag', 'h4').'>';
+
+			foreach($array_of_fields as $fieldname){
+				if(array_key_exists($fieldname, $item->fields)){
+					
+					$label = $item->fields[$fieldname]->label;
+	
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+					if($value){
+						
+						$has_value = true;
+
+						$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+
+							if(intval($params->get('fields_2_modal_display_label',0))){
+								$cf2 .= '<div class="uk-width-1-3"><div>'.$label.'</div></div>';
+							};
+			
+							$cf2 .= '<div class=""><div>'.$value.'</div></div>';
+							if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+						$cf2 .= '</div>';
+					};
+					
+				}else{
+					if($nxdebug) $cf2.= '<div class=" uk-alert uk-alert-warning">'.$fieldname.' not exists</div>';
+				};
+			};
+
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			if($has_value) $construct .= $cf2;
+		};
 	
 		// Classes for Modal Container
 		$modal_cls = 'uk-flex-top ';
