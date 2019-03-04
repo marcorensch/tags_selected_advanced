@@ -535,6 +535,7 @@
 				<option value="div">Div</option>
 			</field>
 			<field type="text" name="modal_title_cls" label="Class for Modal Title" description="space separated list of class names" hint="my-class your-class" />
+			<field type="text" name="fields_1_classes" label="Class for Fields 1" description="space separated list of class names" hint="my-class your-class" default="" />
 			<field
             name="fields_to_render_modal"
             type="textarea" rows="6"

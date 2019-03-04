@@ -719,6 +719,7 @@ class ModTagsselectedHelper
 		{
 			$fieldsString = trim($params->get('fields_to_render_modal'));
 			$array_of_fields = self::multiexplode(array(" ","\r\n"), $fieldsString);
+			$construct .= '<div class="'. $params->get('fields_1_classes') .'">';
 			$construct .= '<table class="uk-table uk-table-divider"><tbody>';
 			foreach($array_of_fields as $fieldname){
 				if(array_key_exists($fieldname, $item->fields)){
@@ -741,6 +742,7 @@ class ModTagsselectedHelper
 				};
 			};
 			$construct .= '</tbody></table>';
+			$construct .= '</div>';
 		}else{
 			$error = '<b>No Customfields configured for display</b> - checkout manual to properly configure the module';
 		};
