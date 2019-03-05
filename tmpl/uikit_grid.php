@@ -24,10 +24,16 @@ if($nxdebug){/*
 <?php */
 };
 
+if($params->get('card_onload_animation') !== 'none'){
+	$scrollspy = 'uk-scrollspy="target: > div > div.item; cls:' . $params->get('card_onload_animation','uk-animation-fade') . '; delay:' . $params->get('card_onload_animation_delay','500') . '"';
+}else{
+	$scrollspy = '';
+};
+
 ?>
 <div class="nx-tagsselectedadvanced nx-tags-grid-member uk-position-relative">
 	
-	<div class="<?php echo $grid_columns . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid>
+	<div class="<?php echo $grid_columns . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid <?= $scrollspy ?>>
 	<?php
 		foreach($items as $element){
 			// Elements' Link

@@ -67,8 +67,8 @@
 					<option value="image_intro">Articles Intro Image</option>
 					<option value="image_fulltext">Full Article Image</option>
 				</field>
-			
 				<field showon="image_source:customfield" type="text" name="customfield_for_image" label="Image Field" description="customfield which contains the image url" hint="name-of-field" class="span3"/>
+				<field name="fallback_image" label="Fallback Image" description="If no Picture is available this one will be used" type="media" directory="" />
 <!-- Content Settings -->
 				<field type="spacer" hr="true"/>
 				<field type="spacer" name="content" label="Content Setup" />
@@ -425,13 +425,23 @@
 					<option value="0">JNo</option>
 				</field>
 				
-				
+				<field
+					 name="card_hover_box_shadow" label="Card Hover Shadow" description="Hover Shadow option" type="list" default="no-shadow">
+					<option value="none">none</option>
+					<option value="uk-box-shadow-hover-small">small</option>
+					<option value="uk-box-shadow-hover-medium">medium</option>
+					<option value="uk-box-shadow-hover-large">large</option>
+					<option value="uk-box-shadow-hover-xlarge">xlarge</option>
+				</field>
+
 				<field
 					showon="element_layout:default_card" name="card_style" label="Card Style" description="Select the Card Type" type="list" default="default">
+					<option value="none">no base class</option>
 					<option value="default">default</option>
 					<option value="primary">primary</option>
 					<option value="secondary">secondary</option>
 				</field>
+
 				<field
 					showon="element_layout:default_card" name="card_size" label="Card Size" description="Select the Card Size" type="list" default="small">
 					<option value="small">small</option>
@@ -467,6 +477,27 @@
 					<option value="1-2">half</option>
 					<option value="1-3">third</option>
 				</field>
+
+				<field name="card_onload_animation" label="Loading Animation" description="Animation type of the Card on Pageload" type="list" default="uk-animation-fade" class="">
+					<option value="none">none</option>
+					<option value="uk-animation-fade">fade</option>
+					<option value="uk-animation-scale-up">scale up</option>
+					<option value="uk-animation-scale-down">scale down</option>
+					<option value="uk-animation-slide-top">slide top</option>
+					<option value="uk-animation-slide-top-small">slide top small</option>
+					<option value="uk-animation-slide-top-medium">slide top medium</option>
+					<option value="uk-animation-slide-bottom">slide bottom</option>
+					<option value="uk-animation-slide-bottom-small">slide bottom small</option>
+					<option value="uk-animation-slide-bottom-medium">slide bottom medium</option>
+					<option value="uk-animation-slide-left">slide left</option>
+					<option value="uk-animation-slide-left-small">slide left small</option>
+					<option value="uk-animation-slide-left-medium">slide left medium</option>
+					<option value="uk-animation-slide-right">slide right</option>
+					<option value="uk-animation-slide-right-small">slide right small</option>
+					<option value="uk-animation-slide-right-medium">slide right medium</option>
+				</field>
+				<field name="card_onload_animation_delay" label="Animation Delay" description="Animation Delay per Item" type="text" hint="500" default="500" class="" filter="integer" />
+				<field name="grid_add_cont_classes" label="Additional Classes" description="Add additional Classes for Grid Element" type="text" hint="my-class your-class" class="span3" />
 
 				<!-- Overlay Settings -->
 				<field showon="element_layout:image_card" type="spacer" name="overlay_spacer_line" hr="true" class="" />
@@ -511,6 +542,8 @@
 					<option value="uk-transition-slide-right-small">slide right small</option>
 					<option value="uk-transition-slide-right-medium">slide right medium</option>
 				</field>
+
+				<field name="overlay_classes" label="Overlay Classes" description="Add additional Classes to the overlay" type="text" hint="my-class your-class" class="span3" />
 				
 			</fieldset>
 <!-- Modal Settings -->

@@ -275,8 +275,13 @@ class ModTagsselectedHelper
 		$img = new stdClass();
 	
 	
-		//First we check if there is an image field given if not we take our fallback image person.png
-		$backup_img = 'modules/mod_tags_selected_advanced/tmpl/assets/img/person.png';
+		//First we check if there is an image field given if not we check for a value inside Fallback Image then we take our fallback image person.png
+		if( null !== $params->get('fallback_image')){
+			$backup_img = $params->get('fallback_image');
+		}else{
+			$backup_img = 'modules/mod_tags_selected_advanced/tmpl/assets/img/person.png';
+		};
+		
 		$img_err = '';
 	
 		// Call the getURL Function based on context (for card or modal)
@@ -547,6 +552,7 @@ class ModTagsselectedHelper
 			case 'image_card':
 				$overlay_type = $params->get('overlay_type','bottom');
 				$overlay_style = $params->get('overlay_style','default');
+				$overlay_classes = $params->get('overlay_classes','');
 				$overlay_content_style = $params->get('overlay_content_style','light');
 				$overlay_content_position = $params->get('overlay_content_position','center');		// used in Overlay Cover Mode
 	
@@ -556,17 +562,17 @@ class ModTagsselectedHelper
 				}else{
 					$overlay_transition = '';
 					$transition_toggle = '">';
-				}
+				};
+
+				$additional_ContClasses .= ' ' . $params->get('grid_add_cont_classes');
 				
-				
-	
-				if($overlay_type !== 'none') $html .= '<div class="uk-inline-clip uk-width-1-1 '.$transition_toggle;
+				if($overlay_type !== 'none') $html .= '<div class="uk-inline-clip uk-width-1-1 '.$additional_ContClasses. ' ' .$transition_toggle;
 	
 				$html .= '<img src="'.$img->url.'" width="100%" alt="">';
 				if($overlay_type !== 'none'){
 					if($overlay_type == 'cover') {
 						$html .= 	'<div class="'.$overlay_transition.' uk-overlay-'.$overlay_style.' uk-padding-small uk-position-cover"></div>';
-						$html .= 	'<div class="uk-overlay uk-position-'.$overlay_content_position.' uk-'.$overlay_content_style.'">';
+						$html .= 	'<div class="uk-overlay uk-position-'.$overlay_content_position.' uk-'.$overlay_content_style. ' ' . $overlay_classes . '">';
 						$html .= 	self::textCardRender($item, $params, $errors);
 						if($params->get('linktype') == 'button'){
 							// Renders the Link Button based on setup:
@@ -720,7 +726,7 @@ class ModTagsselectedHelper
 			$fieldsString = trim($params->get('fields_to_render_modal'));
 			$array_of_fields = self::multiexplode(array(" ","\r\n"), $fieldsString);
 			$construct .= '<div class="'. $params->get('fields_1_classes') .'">';
-			$construct .= '<table class="uk-table uk-table-divider"><tbody>';
+			$construct .= '<table class="uk-table uk-table-small uk-table-divider"><tbody>';
 			foreach($array_of_fields as $fieldname){
 				if(array_key_exists($fieldname, $item->fields)){
 					
@@ -883,10 +889,22 @@ class ModTagsselectedHelper
 		$specUrl = $urlxsetup->url;
 		
 		if($params->get('nxdebug',0)){ echo '<pre>' . var_export($urls, true) . '</pre>';};
+
+		// Hover Box Shadow
+		if($params->get('card_hover_box_shadow') !== 'none'){
+			$hover_box_shadow = $params->get('card_hover_box_shadow');
+		}else{
+			$hover_box_shadow = '';
+		};
 	
 		$ukgrid = '';
-	
-		$containerClasses = 'uk-card uk-card-' . $params->get('card_style','default') . ' uk-card-' . $params->get('card_size','small');
+		if($params->get('element_layout','default') === 'default_card'){
+			$containerClasses = 'uk-card uk-card-' . $params->get('card_style','default') . ' uk-card-' . $params->get('card_size','small') . ' ' . $hover_box_shadow;
+		}else{
+			$containerClasses = 'uk-card ' . $hover_box_shadow;
+		};
+
+		
 		
 		if(intval($params->get('card_hover'))){
 			$containerClasses .= ' uk-card-hover';
@@ -908,17 +926,17 @@ class ModTagsselectedHelper
 
 		$html = 	'<div class="uk-position-relative">';
 		
-		// for mobile if
+		// for mobile if simpleMobile
 		if($params->get('simpleMobile',0)){
-			$html .= 		'<div class="'.$containerClasses.' uk-card-body uk-margin-top-small uk-hidden@m">';
+			$html .= 		'<div class="item '.$containerClasses.' uk-card-body uk-margin-top-small uk-hidden@m">';
 			if(strlen($urlxsetup->badge_inner) > 3 ) $html .= 			'<div class="uk-card-badge uk-label nx-card-badge-mobile">'.$urlxsetup->badge_inner.'</div>';
 			$html .= 			'<h3 class="uk-h5 uk-margin-remove">'.$item->core_title.'</h3>';
 			$html .=			self::linkRender($item, $params, $specUrl);
 			$html .= 		'</div>';
 		};
 
-		//for Desktop
-		$html.= 		'<div class="'.$containerClasses . $cls_large.' " '.$ukgrid.'>';
+		// for Desktop
+		$html.= 		'<div class="item '.$containerClasses . $cls_large.' " '.$ukgrid.'>';
 		
 	
 		// Append Image in position top to container if not disabled in backend
