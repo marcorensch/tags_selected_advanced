@@ -1027,7 +1027,6 @@ class ModTagsselectedHelper
 			$array_of_titles = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $titlesString);
 			$title .= '<div class="uk-padding-small"><'.$params->get('modal_title_tag','h3').' class="'.$params->get('modal_title_cls','').'">';
 			$i = 0;
-			var_dump($array_of_titles);
 			foreach($array_of_titles as $fieldname){
 				var_dump($fieldname);
 				if(strpos($fieldname, '[') !== false){
