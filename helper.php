@@ -732,7 +732,6 @@ class ModTagsselectedHelper
 
 				// Check if we have added Special Class with Fieldname
 				if(strpos($fieldname, '[') !== false){
-					var_dump($fieldname);
 					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
 					$arr = explode("[", $fieldname, 2);
 					$fieldname = $arr[0];
@@ -780,7 +779,6 @@ class ModTagsselectedHelper
 
 				// Check if we have added Special Class with Fieldname
 				if(strpos($fieldname, '[') !== false){
-					var_dump($fieldname);
 					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
 					$arr = explode("[", $fieldname, 2);
 					$fieldname = $arr[0];
@@ -893,19 +891,17 @@ class ModTagsselectedHelper
 			$construct .= '<div class="uk-padding-small"><'.$params->get('modal_title_tag','h3').' class="'.$params->get('modal_title_cls','').'">';
 			$i = 0;
 			foreach($array_of_titles as $fieldname){
-				if(strpos($fieldname, '[') !== false){
-					
+				if(strpos($fieldname, '[') !== false){				
 					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
 					$arr = explode("[", $fieldname, 2);
 					$fieldname = $arr[0];
-
-					var_dump($fieldclass);
 				}else{
 					$fieldclass = false;
 				};
 
 				if(array_key_exists($fieldname, $item->fields)){
-					$value = $item->fields[$fieldname]->value;
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
 					if($i>0) $construct .= ' ';
 
 					if($fieldclass){
@@ -934,13 +930,10 @@ class ModTagsselectedHelper
 			foreach($array_of_fields as $fieldname){
 
 				// Check if we have added Special Class with Fieldname
-				if(strpos($fieldname, '[') !== false){
-					
+				if(strpos($fieldname, '[') !== false){				
 					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
 					$arr = explode("[", $fieldname, 2);
 					$fieldname = $arr[0];
-
-					var_dump($fieldclass);
 				}else{
 					$fieldclass = false;
 				};
@@ -975,6 +968,61 @@ class ModTagsselectedHelper
 			$error = '<b>No Customfields configured for display</b> - checkout manual to properly configure the module';
 		};
 
+		// Fields 2 in Modal
+		if(!empty($params->get('fields_2_to_render_modal'))){
+			$fieldsString = trim($params->get('fields_2_to_render_modal'));
+			$array_of_fields = self::multiexplode(array(" ","\r\n"), $fieldsString);
+
+			$has_value = false;
+
+			$cf2 = '<div class="uk-width-1-1 '.$params->get('fields_2_modal_outer_container_class').'">';
+			$cf2 .= '<div class="uk-card '.$params->get('fields_2_modal_container','').' '.$params->get('fields_2_modal_container_class').'">';
+			$cf2 .= '<'.$params->get('fields_2_modal_title_tag', 'h4').' class="'.$params->get('fields_2_modal_title_class', 'h4').'">'.$params->get('fields_2_modal_title').'</'.$params->get('fields_2_modal_title_tag', 'h4').'>';
+
+			foreach($array_of_fields as $fieldname){
+
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
+					$arr = explode("[", $fieldname, 2);
+					$fieldname = $arr[0];
+				}else{
+					$fieldclass = '';
+				};
+
+				if(array_key_exists($fieldname, $item->fields)){
+					
+					$label = $item->fields[$fieldname]->label;
+	
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+					if($value){
+						
+						$has_value = true;
+
+						$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+
+							if(intval($params->get('fields_2_modal_display_label',0))){
+								$cf2 .= '<div class="uk-width-1-3"><div>'.$label.'</div></div>';
+							};
+			
+							$cf2 .= '<div class=""><div>'.$value.'</div></div>';
+							if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+						$cf2 .= '</div>';
+					};
+					
+				}else{
+					if($nxdebug) $cf2.= '<div class=" uk-alert uk-alert-warning">'.$fieldname.' not exists</div>';
+				};
+			};
+
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			if($has_value) $construct .= $cf2;
+		};
+
 		// Build the Modal Container
 		$html = 	'<div id="nx-modal-'.$item->content_item_id.'" class="'.$modal_cls.'" uk-modal>';
 		$html .= 		'<div class="uk-modal-dialog uk-margin-auto-vertical">';
@@ -990,80 +1038,255 @@ class ModTagsselectedHelper
 		return $html;
 	}
 
-	public static function buildDeckModal($item, $params, $errors){
-		// First we create an array that holds all fields we want to display in the modal (Backend Setting)
+	public static function fieldsAsTable_old($item, $params, $rules, $errors){
 		$nxdebug = $params->get('nxdebug',0);
+		$construct = '<div class="'. $params->get('fields_1_classes') .'" '. $params->get('fields_1_attributes') .'>';
 
-		// Customfield rules
-		$rules = $params->get('customfield_rules',[]);
+			// Mobile
+			$construct .= '<table class="uk-margin-remove uk-table uk-table-striped uk-table-small uk-table-middle uk-hidden@m">';
 
-		// Create empty Construct VAR
-		$construct = '';
+			$fieldsString = trim($params->get('fields_to_render_modal'));
+			$array_of_fields = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $fieldsString);
+			$construct .= '<tbody>';
+			foreach($array_of_fields as $fieldname){
 
-		// Classes for Modal Container
-		$modal_cls = 'uk-flex-top ';
-		if($params->get('modal_container_type', 'container') === 'container'){
-			//$modal_cls .= 'uk-modal-container ';
-		};
-
-		$modal_cls .= $params->get('modal_container_cls');
-
-		// get the image url based on setup
-		$img = self::imagebysetup($item, 'modal', $params, $errors);
-
-		if($img->use){
-			$img_in_construct = '<div class="">'.
-									'<div class="uk-cover-container" uk-height-viewport="offset-top: true; offset-bottom:true">'.			
-										'<img src="'.$img->url.'" alt="Image" style="width:100%; margin-bottom:150px;" >'.
-									'</div>';
-			
-		}else{
-			$img_in_construct = '<div class="nx-no-image-modal">';
-		};
-
-		// Title in Modal
-		if(!empty($params->get('title_to_render_modal', ''))){
-			$titlesString = trim($params->get('title_to_render_modal', ''));
-			$array_of_titles = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $titlesString);
-			$title .= '<div class="uk-padding-small"><'.$params->get('modal_title_tag','h3').' class="'.$params->get('modal_title_cls','').'">';
-			$i = 0;
-			foreach($array_of_titles as $fieldname){
+				// Check if we have added Special Class with Fieldname
 				if(strpos($fieldname, '[') !== false){
+					
 					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
 					$arr = explode("[", $fieldname, 2);
 					$fieldname = $arr[0];
+
 				}else{
 					$fieldclass = false;
 				};
 
 				if(array_key_exists($fieldname, $item->fields)){
-					$value = $item->fields[$fieldname]->value;
+					
+					$label = $item->fields[$fieldname]->label;
 
-					if($i>0) $title .= ' ';
-
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+					
 					if($fieldclass){
-						$title .= '<div class="' .$fieldclass[1].'">';
-						$title .= $value;
-						$title .= '</div>';
-
+						$construct .= '<tr class="' .$fieldclass[1].'">';
 					}else{
-						$title .= $value;
+						$construct .= '<tr>';
 					};
-					$i++;
+					
+					if(intval($params->get('fields_modal_display_label',1))){
+						$construct .= '<td><span class="'.$params->get('modal_label_tag_class','').' uk-text-small">'.$label.'</span></td>';
+					};
+
+					$construct .= '<td class="'.$params->get('modal_value_class','').' uk-text-small">'.$value.'</td>';
+					if($nxdebug) $construct.= '<td class=" uk-alert uk-alert-warning">'.$fieldname.'</td>';
+					$construct .= '</tr>';
 				}else{
-					if($nxdebug) $title.= '<span class="uk-alert uk-alert-warning">'.$fieldname.' not exists</span>';
+					if($nxdebug) $construct.= '<tr class=" uk-alert uk-alert-warning"><td>'.$fieldname.' not exists</td></tr>';
 				};
 			};
-			$title .= '</'.$params->get('modal_title_tag','h3').'></div>';
-		};
 
-		// Fields in Modal
-		if(!empty($params->get('fields_to_render_modal')))
-		{
+			$construct .= '</tbody>';
+			$construct .= '</table>';
+
+			// Desktops
+			$construct .= '<table class="uk-margin-remove uk-table uk-table-striped uk-table-small uk-table-middle uk-visible@m">';
+
 			$fieldsString = trim($params->get('fields_to_render_modal'));
 			$array_of_fields = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $fieldsString);
+			$construct .= '<tbody>';
+			foreach($array_of_fields as $fieldname){
+
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					
+					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
+					$arr = explode("[", $fieldname, 2);
+					$fieldname = $arr[0];
+
+				}else{
+					$fieldclass = false;
+				};
+
+				if(array_key_exists($fieldname, $item->fields)){
+					
+					$label = $item->fields[$fieldname]->label;
+
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+					
+					if($fieldclass){
+						$construct .= '<tr class="' .$fieldclass[1].'">';
+					}else{
+						$construct .= '<tr>';
+					};
+					
+					if(intval($params->get('fields_modal_display_label',1))){
+						$construct .= '<td><'.$params->get('modal_label_tag','h3').' class="'.$params->get('modal_label_tag_class','').'">'.$label.'</'.$params->get('modal_label_tag','h3').'></td>';
+					};
+
+					$construct .= '<td class="'.$params->get('modal_value_class','').'">'.$value.'</td>';
+					if($nxdebug) $construct.= '<td class=" uk-alert uk-alert-warning">'.$fieldname.'</td>';
+					$construct .= '</tr>';
+				}else{
+					if($nxdebug) $construct.= '<tr class=" uk-alert uk-alert-warning"><td>'.$fieldname.' not exists</td></tr>';
+				};
+			};
+
+			$construct .= '</tbody>';
+			$construct .= '</table>';
+		$construct .= '</div>';
+
+		return $construct;
+	}
+	public static function fieldsAsTable($item, $params, $rules, $errors){
+		$nxdebug = $params->get('nxdebug',0);
+		$skipper = $params->get('skip_field_if_value','');
+		//echo '<script>console.log("'.$skipper.'");</script>';
+		if(strlen($skipper) > 0 ){
+			$skip = true;
+			if(strpos($skipper,',')){
+				//echo '<script>console.log("'.$skipper.' contains Comma");</script>';
+				// delimiter set create array via explode
+				$skipper_array = explode(',', $skipper);
+			}else{
+				//echo '<script>console.log("'.$skipper.' does not contain Comma");</script>';
+				// No delimiter in field - one single skipper rule so put it into an array for later use
+				$skipper_array = [$skipper];
+			};
+		}else{
+			$skip = false;
+		};
+		$construct = '<div class="'. $params->get('fields_1_classes') .'" '. $params->get('fields_1_attributes') .'>';
+
+			// Mobile
+			$construct .= '<table class="uk-margin-remove uk-table uk-table-striped uk-table-small uk-table-middle uk-hidden@m">';
+
+			$fieldsString = trim($params->get('fields_to_render_modal'));
+			$array_of_fields = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $fieldsString);
+			$construct .= '<tbody>';
+			foreach($array_of_fields as $fieldname){
+				
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					
+					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
+					$arr = explode("[", $fieldname, 2);
+					$fieldname = $arr[0];
+
+				}else{
+					$fieldclass = false;
+				};
+
+				
+
+				if(array_key_exists($fieldname, $item->fields)){
+
+					$label = $item->fields[$fieldname]->label;
+
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+
+					if($skip){
+						if(in_array($value, $skipper_array)){
+							echo '<script>console.log("'.$item->fields['nummer']->value. ' - '.$label.' skipped on Mobile weil Value = '.$value.'");</script>';
+							continue;
+						};
+					};
+					
+
+					if(strlen($value) == 0) continue;
+
+					if($fieldclass){
+						$construct .= '<tr class="' .$fieldclass[1].'">';
+					}else{
+						$construct .= '<tr>';
+					};
+					
+					if(intval($params->get('fields_modal_display_label',1))){
+						$construct .= '<td><span class="'.$params->get('modal_label_tag_class','').' uk-text-small">'.$label.'</span></td>';
+					};
+
+					$construct .= '<td class="'.$params->get('modal_value_class','').' uk-text-small">'.$value.'</td>';
+					if($nxdebug) $construct.= '<td class=" uk-alert uk-alert-warning">'.$fieldname.'</td>';
+					$construct .= '</tr>';
+					
+				}else{
+					if($nxdebug) $construct.= '<tr class=" uk-alert uk-alert-warning"><td>'.$fieldname.' not exists</td></tr>';
+				};
+			};
+
+			$construct .= '</tbody>';
+			$construct .= '</table>';
+
+			// Desktops
+			$construct .= '<table class="uk-margin-remove uk-table uk-table-striped uk-table-small uk-table-middle uk-visible@m">';
+
+			$fieldsString = trim($params->get('fields_to_render_modal'));
+			$array_of_fields = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $fieldsString);
+			$construct .= '<tbody>';
+			foreach($array_of_fields as $fieldname){
+
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					
+					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
+					$arr = explode("[", $fieldname, 2);
+					$fieldname = $arr[0];
+
+				}else{
+					$fieldclass = false;
+				};
+
+				if(array_key_exists($fieldname, $item->fields)){
+					
+					$label = $item->fields[$fieldname]->label;
+
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+					if($skip){
+						if(in_array($value, $skipper_array)){
+							echo '<script>console.log("'.$item->fields['nummer']->value. ' - '.$label.' skipped on Desktop weil Value = '.$value.'");</script>';
+							continue;
+						};
+					};
+					
+
+					if(strlen($value) == 0) continue;
+					
+					if($fieldclass){
+						$construct .= '<tr class="' .$fieldclass[1].'">';
+					}else{
+						$construct .= '<tr>';
+					};
+					
+					if(intval($params->get('fields_modal_display_label',1))){
+						$construct .= '<td><'.$params->get('modal_label_tag','h3').' class="'.$params->get('modal_label_tag_class','').'">'.$label.'</'.$params->get('modal_label_tag','h3').'></td>';
+					};
+
+					$construct .= '<td class="'.$params->get('modal_value_class','').'">'.$value.'</td>';
+					if($nxdebug) $construct.= '<td class=" uk-alert uk-alert-warning">'.$fieldname.'</td>';
+					$construct .= '</tr>';
+				}else{
+					if($nxdebug) $construct.= '<tr class=" uk-alert uk-alert-warning"><td>'.$fieldname.' not exists</td></tr>';
+				};
+			};
+
+			$construct .= '</tbody>';
+			$construct .= '</table>';
+		$construct .= '</div>';
+
+		return $construct;
+	}
+
+	public static function fieldsAsGrid($item, $params, $rules, $errors){
+		$nxdebug = $params->get('nxdebug',0);
+		$construct = '';
+
+		$fieldsString = trim($params->get('fields_to_render_modal'));
+			$array_of_fields = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $fieldsString);
 			$construct .= '<div class="'. $params->get('fields_1_classes') .'">';
-			$construct .= '<div><div class="uk-child-width-1-3 uk-grid-collapse uk-flex uk-flex-middle" uk-grid>';
+			$construct .= '<div><div class="uk-child-width-1-3 uk-grid-small uk-flex uk-flex-middle" uk-grid '. $params->get('fields_1_attributes') .'>';
 			foreach($array_of_fields as $fieldname){
 
 				// Check if we have added Special Class with Fieldname
@@ -1103,22 +1326,332 @@ class ModTagsselectedHelper
 			};
 			$construct .= '</div></div>';
 			$construct .= '</div>';
+
+		return $construct;
+	}
+
+	public static function buildAdvancedConstruct($data, $item, $rules){
+		$dataobject = json_decode($data);		// fieldname ($data construct like {"type":"something", "":"", "":""}) now handeld as std Object
+		$fieldhasdata = false;
+		switch($dataobject->type){
+			case 'url':
+			default:
+				//var_dump($dataobject->url);
+				if(strlen($item->fields[$dataobject->url]->value) > 7){
+					$fieldhasdata = true;
+				
+					$adress_object = (object) ['fieldname' => $dataobject->url, 'fieldvalue' => $item->fields[$dataobject->url]->value, 'context' => 'modal'];
+					$adress = self::customRules($adress_object, $rules);
+
+					// Check for adress label at the end $adresslabel contains fieldname to use for labeling the url
+					if(!empty($dataobject->display)){
+						$adresslabel = $dataobject->display;
+					} elseif (!empty($dataobject->altdisplay)) {
+						$adresslabel = $dataobject->altdisplay;
+					}else{
+						$adresslabel = $adress;
+					};
+					
+					$adresslabel_object = (object) ['fieldname' => $adresslabel, 'fieldvalue' => $item->fields[$adresslabel]->value, 'context' => 'modal'];
+					
+					$adressLabel = self::customRules($adresslabel_object, $rules);
+
+					
+
+					if(!empty($dataobject->fieldclass)){
+						$fieldclass = $dataobject->fieldclass;
+					}else{
+						$fieldclass="";
+					};
+
+					if(!empty($dataobject->linkclass)){
+						$linkclass = $dataobject->linkclass;
+					}else{
+						$linkclass="";
+					};
+
+					if(!empty($dataobject->linktitle)){
+						$linktitle = $dataobject->linktitle;
+					}else{
+						$linktitle = $adressLabel;
+					};
+
+					// Check for link target
+					if(!empty($dataobject->target)){
+						$linktarget = $dataobject->target;
+					}else{
+						$linktarget = '_blank';
+					};
+
+					
+					$adressConstruct = '<a data-used="'.$fieldhasdata.'" href="'.$adress.'" target="'.$linktarget.'" title="'.$linktitle.'" class="'.$linkclass.'">'.$adressLabel.'</a>';
+					return $adressConstruct;
+				};
+
+			break;
+		};
+		
+		// no data for specific fields
+		return false;
+	}
+
+	public static function buildDeckModal($item, $params, $errors){
+		$nxdebug = $params->get('nxdebug',0);
+		// First we create an array that holds all fields we want to display in the modal (Backend Setting)
+		
+
+		// Customfield rules
+		$rules = $params->get('customfield_rules',[]);
+
+		// Create empty Construct VAR
+		$construct = '';
+
+		// Classes for Modal Container
+		$modal_cls = 'uk-flex-top ';
+		if($params->get('modal_container_type', 'container') === 'container'){
+			//$modal_cls .= 'uk-modal-container ';
+		};
+
+		$modal_cls .= $params->get('modal_container_cls');
+
+		// get the image url based on setup
+		$img = self::imagebysetup($item, 'modal', $params, $errors);
+
+		if($img->use){
+			$img_in_construct = '<img src="'.$img->url.'" alt="Image" class="'.$params->get('modal_image_class','').'" style="'.$params->get('modal_image_style','').'" >';
+		};
+
+		// Title in Modal
+		if(!empty($params->get('title_to_render_modal', ''))){
+			$titlesString = trim($params->get('title_to_render_modal', ''));
+			$array_of_titles = self::multiexplode(array('\ (?![^[]*])',"\r\n"), $titlesString);
+			$title = '<div class="uk-padding-small"><'.$params->get('modal_title_tag','h3').' class="'.$params->get('modal_title_cls','').'">';
+			$i = 0;
+			foreach($array_of_titles as $fieldname){
+				if(strpos($fieldname, '[') !== false){
+					preg_match('/\[(.*?)\]/' , $fieldname, $fieldclass);
+					$arr = explode("[", $fieldname, 2);
+					$fieldname = $arr[0];
+				}else{
+					$fieldclass = false;
+				};
+
+				if(array_key_exists($fieldname, $item->fields)){
+					$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+					$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+
+					if($i>0) $title .= ' ';
+
+					if($fieldclass){
+						$title .= '<div class="' .$fieldclass[1].'">' . $value . '</div>';
+					}else{
+						$title .= $value;
+					};
+					$i++;
+				}else{
+					if($nxdebug) $title.= '<span class="uk-alert uk-alert-warning">'.$fieldname.' not exists</span>';
+				};
+			};
+			$title .= '</'.$params->get('modal_title_tag','h3').'></div>';
+		};
+
+		// Fields in Modal
+		if(!empty($params->get('fields_to_render_modal')))
+		{
+			switch($params->get('deck_fields_template')){
+				case 'table':
+					$construct .= self::fieldsAsTable($item, $params, $rules, $errors);
+				break;
+				case 'grid':
+				default:
+				$construct .= self::fieldsAsGrid($item, $params, $rules, $errors);
+
+			};
 		}else{
 			$error = '<b>No Customfields configured for display</b> - checkout manual to properly configure the module';
 		};
 
+		// Fields 2 in Modal
+		if(!empty($params->get('fields_2_to_render_modal'))){
+			$fieldsString = trim($params->get('fields_2_to_render_modal'));
+			$array_of_fields = self::multiexplode(array('\ (?![^[]{}*])',"\r\n"), $fieldsString);
+
+			$has_value = false;
+
+			// Mobile
+			$cf2 = '<div class="uk-hidden@m uk-width-1-1 '.$params->get('fields_2_modal_outer_container_class').'">';
+			$cf2 .= '<div class="uk-card '.$params->get('fields_2_modal_container','').' '.$params->get('fields_2_modal_container_class').' uk-padding-remove">';
+			$cf2 .= '<div class="uk-child-width-auto uk-grid-small uk-flex uk-flex-middle" uk-grid>';
+				$cf2 .= '<div>';
+				$cf2 .= '<span class="'.$params->get('fields_2_modal_title_class', 'h4').' uk-text-small">'.$params->get('fields_2_modal_title').'</span>';
+				$cf2 .= '</div>';
+				$cf2 .= '<div class="custom_fields_2">';
+
+			foreach($array_of_fields as $fieldname){
+
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					preg_match('/\[(.*?)\]/' , $fieldname, $classes);
+					$fieldclass = $classes[1];
+					$fieldname = str_replace($classes[0],'', $fieldname);
+				}else{
+					$fieldclass = '';
+				};
+
+				//var_dump($fieldname);
+
+				// Builder for AdvancedFieldCustomization
+				if(strpos($fieldname, '{') !== false){
+					// We have a Combined Field
+
+					$advancedFieldConstruct = self::buildAdvancedConstruct($fieldname, $item, $rules);
+					
+					// Build the HTML
+					if($advancedFieldConstruct){
+						$has_value = true; // ??
+
+						$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+/* --> Only URL atm no label field required
+							if(intval($params->get('fields_2_modal_display_label',0))){
+								$cf2 .= '<div class="uk-width-1-3 uk-text-small"><div>'.$label.'</div></div>';
+							};
+			*/
+							$cf2 .= '<div class="uk-width-1-1 '.$fieldclass.'">'.$advancedFieldConstruct.'</div>';
+							if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+						$cf2 .= '</div>';
+					};
+					
+
+				}else{
+					// regular One Field Element
+					if(array_key_exists($fieldname, $item->fields)){
+						
+						$label = $item->fields[$fieldname]->label;
+		
+						$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+						$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+						if($value){
+							
+							$has_value = true;
+
+							$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+
+								if(intval($params->get('fields_2_modal_display_label',0))){
+									$cf2 .= '<div class="uk-width-1-3 uk-text-small"><div>'.$label.'</div></div>';
+								};
+				
+								$cf2 .= '<div class="'.$fieldclass.' uk-text-small"><div>'.$value.'</div></div>';
+								if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+							$cf2 .= '</div>';
+						};
+						
+					}else{
+						if($nxdebug) $cf2.= '<div class=" uk-alert uk-alert-warning">'.$fieldname.' not exists</div>';
+					};
+				};
+			};
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			// Desktop
+			$cf2 .= '<div class=" uk-visible@m uk-width-1-1 '.$params->get('fields_2_modal_outer_container_class').'">';
+			$cf2 .= '<div class="uk-card '.$params->get('fields_2_modal_container','').' '.$params->get('fields_2_modal_container_class').'">';
+			$cf2 .= '<div class="uk-child-width-1-2 uk-grid-small uk-flex uk-flex-middle" uk-grid>';
+				$cf2 .= '<div>';
+				$cf2 .= '<'.$params->get('fields_2_modal_title_tag', 'h4').' class="'.$params->get('fields_2_modal_title_class', 'h4').'">'.$params->get('fields_2_modal_title').'</'.$params->get('fields_2_modal_title_tag', 'h4').'>';
+				$cf2 .= '</div>';
+				$cf2 .= '<div class="custom_fields_2">';
+
+			foreach($array_of_fields as $fieldname){
+
+				// Check if we have added Special Class with Fieldname
+				if(strpos($fieldname, '[') !== false){
+					preg_match('/\[(.*?)\]/' , $fieldname, $classes);
+					$fieldclass = $classes[1];
+					$fieldname = str_replace($classes[0],'', $fieldname);
+				}else{
+					$fieldclass = '';
+				};
+
+				// Builder for AdvancedFieldCustomization
+				if(strpos($fieldname, '{') !== false){
+					// We have a Combined Field
+
+					$advancedFieldConstruct = self::buildAdvancedConstruct($fieldname, $item, $rules);
+					
+					// Build the HTML
+					if($advancedFieldConstruct){
+						
+						$has_value = true; // ??
+
+						$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+/* --> Only URL atm no label field required
+							if(intval($params->get('fields_2_modal_display_label',0))){
+								$cf2 .= '<div class="uk-width-1-3 uk-text-small"><div>'.$label.'</div></div>';
+							};
+			*/
+							$cf2 .= '<div class="uk-width-1-1 '.$fieldclass.'">'.$advancedFieldConstruct.'</div>';
+							if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+						$cf2 .= '</div>';
+					};
+					
+
+				}else{
+
+					if(array_key_exists($fieldname, $item->fields)){
+						
+						$label = $item->fields[$fieldname]->label;
+		
+						$cf_object = (object) ['fieldname' => $fieldname, 'fieldvalue' => $item->fields[$fieldname]->value, 'context' => 'modal']; 		//{'fieldname': $fieldname, 'fieldvalue': $item->fields[$fieldname]->value};
+						$value = self::customRules($cf_object, $rules);  //$value = $item->fields[$fieldname]->value;
+						if($value){
+							
+							$has_value = true;
+
+							$cf2 .= '<div class="uk-child-width-auto uk-margin-remove uk-grid-small" uk-grid>';
+
+								if(intval($params->get('fields_2_modal_display_label',0))){
+									$cf2 .= '<div class="uk-width-1-3"><div>'.$label.'</div></div>';
+								};
+				
+								$cf2 .= '<div class="'.$fieldclass.'"><div>'.$value.'</div></div>';
+								if($nxdebug) $cf2.= '<div><div class=" uk-alert uk-alert-warning">'.$fieldname.'</div></div>';
+
+							$cf2 .= '</div>';
+						};
+						
+					}else{
+						if($nxdebug) $cf2.= '<div class=" uk-alert uk-alert-warning">'.$fieldname.' not exists</div>';
+					};
+				};
+			};
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			$cf2 .= '</div>';
+			$cf2 .= '</div>';
+
+			if($has_value) $construct .= $cf2;
+		};
+
 		// Build the Modal Container
-		$html = 	'<div id="nx-modal-'.$item->content_item_id.'" class="'.$modal_cls.'" uk-modal>';
-		$html .= 		'<div class="uk-modal-dialog uk-margin-auto-vertical">';
-		$html .= 			'<button class="uk-modal-close-default" type="button" uk-close></button>';
-		$html .= 				$img_in_construct;
-		$html .= 				'<div class="uk-overlay uk-position-bottom uk-padding-remove '.$params->get('fields_container_classes').'">';
+		$html = 	'<div id="nx-modal-'.$item->content_item_id.'" class="" uk-modal uk-height-viewport="offset-top: true; offset-bottom: true">';
+		$html .= 		'<div class="uk-modal-dialog uk-margin-auto-vertical '.$modal_cls.'">';
+		$html .= 			'<button class="uk-modal-close-default nx-modal-close" type="button" uk-close></button>';
+		$html .= 				'<div style="width:87%">' . $img_in_construct . '</div>';
+		$html .= 				'<div class="uk-position-bottom uk-padding-remove '.$params->get('fields_container_classes').'">';
 		$html .= 					'<div class="deck_info_top '.$params->get('deck_top_classes').'">';
 		$html .= 						$title;
 		$html .= 					'</div>';
-		$html .= 						$construct;
+		$html .= 					$construct;
 		$html .= 				'</div>';
-		$html .= 			'</div>';
+		//$html .= 			'</div>';
 		$html .= 		'</div>';
 		$html .= 	'</div>';
 

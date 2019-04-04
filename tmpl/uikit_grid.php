@@ -30,7 +30,27 @@ if($params->get('card_onload_animation') !== 'none'){
 	$scrollspy = '';
 };
 
+// Add Special Styling Attr. for Deck
+if($params->get('modal_render_mode') === 'deck'){
+	$document = JFactory::getDocument();
+	$deck = '.deck_info_top {
+					height:' . $params->get('deck_top_height','150px') . ';
+				}
+				@supports(-webkit-clip-path: ' . $params->get('deck_top_clippath','polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%)') . ') or (clip-path: ' . $params->get('deck_top_clippath','polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%)') . ') {
+
+					.deck_info_top {
+						-webkit-clip-path: ' . $params->get('deck_top_clippath','polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%)') . ';
+						clip-path: ' . $params->get('deck_top_clippath','polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%)') . ';
+						
+					}
+					
+				  }';
+	$document->addStyleDeclaration( $deck );
+
+};
+
 ?>
+<link href="https://fonts.googleapis.com/css?family=Teko:400,700" rel="stylesheet"> 
 <div class="nx-tagsselectedadvanced nx-tags-grid-member uk-position-relative">
 	
 	<div class="<?php echo $grid_columns . $grid_cutter . $grid_divider . $grid_match; ?>" uk-grid <?= $scrollspy ?>>
@@ -41,7 +61,9 @@ if($params->get('card_onload_animation') !== 'none'){
 			
 			// render the Element
 			echo ModTagsselectedHelper::buildGridElement($element, $params, $errors);
-			if($params->get('link_mode') == 'modal') echo ModTagsselectedHelper::buildModal($element, $params, $errors);
+			if($params->get('link_mode') == 'modal' && $params->get('modal_render_mode','default') == 'default') echo ModTagsselectedHelper::buildModal($element, $params, $errors);
+			if($params->get('link_mode') == 'modal' && $params->get('modal_render_mode') == 'alternative') echo ModTagsselectedHelper::buildAlternativeModal($element, $params, $errors);
+			if($params->get('link_mode') == 'modal' && $params->get('modal_render_mode') == 'deck') echo ModTagsselectedHelper::buildDeckModal($element, $params, $errors);
 
 		};
 	?>

@@ -549,6 +549,15 @@
 <!-- Modal Settings -->
 			<fieldset name="modal_setup">
 			<field type="spacer" name="modalintro" label="MOD_TAGS_SELECTED_ADVANCED_MODAL_INTRO" />
+			<field name="modal_render_mode" type="list" label="Modal Rendering" description="Style for Modal" default="default">
+				<option value="default">default</option>
+				<option value="alternative">alternative</option>
+				<option value="deck">deck</option>
+			</field>
+			<field showon="modal_render_mode:alternative" name="modal_grid_mode" type="list" label="Modal Grid Mode" description="Style for Modal" default="default">
+				<option value="default">default (side by side)</option>
+				<option value="stacked">stacked</option>
+			</field>
 			<field
             name="title_to_render_modal"
             type="textarea" rows="6"
@@ -567,19 +576,59 @@
 				<option value="span">Span</option>
 				<option value="div">Div</option>
 			</field>
+
+
 			<field type="text" name="modal_title_cls" label="Class for Modal Title" description="space separated list of class names" hint="my-class your-class" />
+			<field type="text" name="fields_container_classes" label="Class for Fields Container" description="space separated list of class names" hint="my-class your-class" default="" />
+
+
+<!-- Deck Options -->
+			<field showon="modal_render_mode:deck" type="spacer" name="deck_setup_title" label="Advanced Deck Settings" />
+			<field showon="modal_render_mode:deck" name="deck_fields_template" type="list" label="Fields Render Template" description="Select the Template type for the Fields 1 Section" default="table">
+				<option value="table">Table</option>
+				<option value="grid">Grid</option>
+			</field>
+			<field showon="modal_render_mode:deck" type="text" name="deck_top_classes" label="Class for Deck ContentTop" description="space separated list of class names" hint="my-class your-class" default="" />
+			<field showon="modal_render_mode:deck" type="text" name="deck_top_height" label="Deck ContentTop height" description="height value" hint="150px" default="150px" />
+			<field showon="modal_render_mode:deck" type="spacer" name="clippath_link" label="Design your clippath comfortably at: https://bennettfeely.com/clippy/" />
+			<field showon="modal_render_mode:deck" type="text" class="span3" name="deck_top_clippath" label="Clippath for Deck Content Top" default="polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%)" description="Add here your Clippath for the Deck Content Top in Format: polygon(78% 63%, 100% 78%, 100% 100%, 0 100%, 0 85%) - You can design your clippath comfortably at: https://bennettfeely.com/clippy/" />
+			
+
+
+
 			<field type="text" name="fields_1_classes" label="Class for Fields 1" description="space separated list of class names" hint="my-class your-class" default="" />
+			<field type="text" name="fields_1_attributes" label="Attributes for Fields 1" description="Attribute Commands Escape Characters with \ " hint="data-attribute" default="" />
+			
+			
 			<field
             name="fields_to_render_modal"
             type="textarea" rows="6"
             label="Fields to render in Modal"
-            description="Which Fields should be rendered in Modal? (one field-name per row or seperated by spaces)"
+            description="Which Fields should be rendered in Modal? (one field-name per row or seperated by spaces - If Modal rendering Alternative is setted up classes per field can be added inside square brackets like: [my-class your-class]"
 			hint="field-name-a field-name-b" />
+
+			<field showon="modal_render_mode!:default[AND]fields_modal_display_label:1" type="text" name="skip_field_if_value" label="Field Values to skip" description="If your field contains the same (and only this) value skip the row (comma separated list)" hint="0, ," />
 
 			<field name="fields_modal_display_label" type="radio" default="1" label="Display Label" description="Should the Field(s) be rendered including label?" class="btn-group span3">
 					<option value="1">JYes</option>
 					<option value="0">JNo</option>
 				</field>
+
+			<field showon="modal_render_mode!:default[AND]fields_modal_display_label:1" name="modal_label_tag" type="list" label="Modal Labels Tag" description="Style Labels in Modal" default="h3">
+				<option value="h1">H1</option>
+				<option value="h2">H2</option>
+				<option value="h3">H3</option>
+				<option value="h4">H4</option>
+				<option value="h5">H5</option>
+				<option value="h6">H6</option>
+				<option value="p">Paragraph</option>
+				<option value="span">Span</option>
+				<option value="div">Div</option>
+			</field>
+
+			<field showon="modal_render_mode!:default[AND]fields_modal_display_label:1" type="text" name="modal_label_tag_class" label="Modal Labels Class" description="" hint="my-class your-class" />
+			<field showon="modal_render_mode!:default" type="text" name="modal_value_class" label="Modal Values Class" description="" hint="my-class your-class" />
+			
 			
 			<field type="spacer" name="fields_2_modal_spacer" label="Fields Section 2 in Modal" />
 			<field type="text" name="fields_2_modal_outer_container_class" label="Fields 2 Outter Container Class" description="" hint="my-class your-class" />
@@ -640,6 +689,9 @@
 					<option value="1-2">half</option>
 					<option value="1-3">third</option>
 				</field>
+			<field showon="modal_render_mode!:default[AND]fields_modal_display_label:1" name="modal_image_class" label="Modal Image Class" type="text" hint="my-class your-class"/>
+			<field showon="modal_render_mode!:default[AND]fields_modal_display_label:1" name="modal_image_style" label="Modal Image Styles" type="text" hint="width:100%; margin:10px 0 160px 10px; border-radius:10px;"/>
+			
 			
 			<field name="modal_container_type" label="Modal Type" description="" type="list" default="container">
 				<option value="default">Default</option>
